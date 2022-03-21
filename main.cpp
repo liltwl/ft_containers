@@ -3,35 +3,66 @@
 #include <stack>
 #include <vector>
 #include "vector.hpp"
+#include "stack.hpp"
+#include <stack>
+#include <iterator>
+#include <string>
 
 int main()
 {
   
     // allocator for integer values
-    std::allocator<int> myAllocator;
+    // std::allocator<int> myAllocator;
+    // // allocate space for five ints
+    // int* arr = myAllocator.allocate(5);
+    // std::vector<std::string> ss(5, "Dwed");
+    // // construct arr[0] and arr[3]
+    // myAllocator.construct(arr, 100);
+    // arr[3] = 10;
+    // std::ptrdiff_t p = arr[3];
+    // std::cout << arr[1] << std::endl;
+    // std::cout << arr[3] << std::endl;
 
-    std::allocator<int>::pointer dd;
-    // allocate space for five ints
-    int* arr = myAllocator.allocate(5);
+    
+    // ft::stack<std::string> d;
+    //ft::vector<std::string> ss;
+    // ft::vector<std::string> s(4, "d");
+    // std::vector<std::string> ss();
+    // std::cout << ss.front() << std::endl;
+    //ss.reserve(5);
+    //ss.resize(6);
+    // s.reserve(2);
+    // s.resize(6);
 
-    dd = &arr[1];
-    // construct arr[0] and arr[3]
-    myAllocator.construct(arr, 100);
-    arr[3] = 10;
-    std::ptrdiff_t p = arr[3];
-    std::cout << dd << std::endl;
-    std::cout << arr[1] << std::endl;
-    std::cout << arr[3] << std::endl;
+    // // deallocate space for five ints
+    // std::cout << s.size()<< " " << s.capacity() << " " << *s.begin() << std::endl;
+    // std::cout << ss.size()<< " " << ss.capacity() << " " << ss[2] << std::endl;
+    // myAllocator.deallocate(arr, 5);
 
 
+    ft::vector<std::string> tmp(4, "d");
+    ft::vector<std::string> s(tmp.begin(), tmp.end());
+    //s = tmp;
+    cout << " we;frfe" << endl;
+    ft::vector<std::string>::iterator ss = s.begin();
+    cout << " we;frfe" << endl;
+    //s.insert(ss, "de");
+    tmp.push_back("omar");
+    tmp.push_back("noobnoob");
+    std::cout << tmp.size()<< " " << tmp.capacity() << " " << *ss << std::endl;
+    std::cout << tmp.size()<< " " << tmp.capacity() << " " << *ss << std::endl;
+   for (ft::vector<std::string>::iterator ff = tmp.begin(); ff < tmp.end() ; ff++)
+        std::cout << *ff << std::endl;
+    //std::cout << tmp.size()<< " " << tmp.capacity() << " " << tmp[3] << std::endl;
 
-    vector<int> ss;
-    vector<int> s(4);
 
-    s = ss;
-    // deallocate space for five ints
-    std::cout << s.size() << std::endl;
-    myAllocator.deallocate(arr, 5);
-  
+    // ft::vector<std::string> s(7, "wesh");
+    // ft::vector<std::string> f(5, "asat");
+    
+    // s.insert(s.begin(), s.begin() + 2, s.begin() + 5);
+    // for (ft::vector<std::string>::iterator ss = s.begin(); ss < s.end() ; ss++)
+    //     std::cout << *ss << std::endl;
+    // for (ft::vector<std::string>::iterator ss = f.begin(); ss < f.end() ; ss++)
+    //     std::cout << *ss << std::endl;
     return 0;
 }
