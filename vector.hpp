@@ -38,7 +38,7 @@ public :
         // std::cout << "default vector const called" << std::endl;
     }
     explicit vector (size_type _n, const value_type& val = value_type(),
-                const allocator_type& alloc = allocator_type()) :  n(_n), cap(n + 1), arg(NULL)
+                const allocator_type& alloc = allocator_type()) :  n(_n), cap(n + 1), arg(NULL), allocc(alloc)
     {
 		arg = allocc.allocate(cap);
 		for (int i = 0; i < _n ; i++)
@@ -47,17 +47,21 @@ public :
     }
 
 	template <class InputIterator>
-	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : arg(NULL), n(0), cap(0)
+	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : arg(NULL), n(0), cap(0), allocc(alloc)
 	{
 		n = last - first;
 		cap = n + 1;
 		arg = allocc.allocate(cap);
 		for (int i = 0; i < n ; i++)
-			allocc.construct(&arg[i], *(first++));
+		{
+			allocc.construct(&arg[i], *(first));
+			first++;
+		}
 	}
 
 	vector (const vector& x) : arg(NULL), n(0), cap(0)
 	{
+		allocc = x.allocc;
 		*this = x;
 		// std::cout << "vector copy const called" << std::endl;
 	}
@@ -72,7 +76,7 @@ public :
 	{
 		if (this != &x)
 		{
-			if (n > 0)
+			if (cap > 0)
 			{
 				allocc.deallocate(arg, cap);
 				n = 0;
@@ -86,12 +90,19 @@ public :
 					allocc.construct(&arg[i], x[i]);
 			}
 			else
-				arg = NULL;
+				arg = allocc.allocate(cap);
 		}
 		// std::cout << "vector copy operator called" << std::endl;
 		return	(*this);
 	}
 
+	class outofbounds : public std::exception
+        {   public : 
+                const char* what() const throw()
+				{
+					return("index out-of-bounds");
+				}
+        };
 
 	size_type size() const
 	{
@@ -110,12 +121,22 @@ public :
 
 	reverse_iterator rbegin()
 	{
-		return (reverse_iterator(arg + n));
+		return (reverse_iterator(end()));
 	}
 
 	reverse_iterator rend()
 	{
-		return reverse_iterator(arg);
+		return reverse_iterator(begin());
+	}
+
+	const_reverse_iterator rbegin() const
+	{
+		return (const_reverse_iterator(end()));
+	}
+
+	const_reverse_iterator rend() const
+	{
+		return const_reverse_iterator(begin());
 	}
 
 	iterator end()
@@ -141,7 +162,7 @@ public :
 				allocc.construct(&arg[i], val);
 			}
 		}
-		else if (cap <= _n && n > 0)
+		else if (_n > 0)
 		{
 			arg = allocc.allocate(_n + 1);
 			for (i = 0; i < _n ; i++)
@@ -152,11 +173,11 @@ public :
 					allocc.construct(&arg[i], val);
 			}
 			allocc.deallocate(tmp, cap);
+			cap = _n + 1;
 		}
 		else
 			arg = NULL;
 		n = _n;
-		cap = n + 1;
 	}
 
 	size_type capacity() const
@@ -199,17 +220,21 @@ public :
 
 	const_reference operator[] (size_type n) const
 	{
-		return (arg[n]);
+			return (arg[n]);
 	}
 	
-	reference at(size_type n)
+	reference at(size_type _n)
 	{
-		return (arg[n]);
+		if (_n < this->n)
+			return (arg[_n]);
+		throw outofbounds();
 	}
 
-	const_reference at (size_type n) const
+	const_reference at (size_type _n) const
 	{
-		return (arg[n]);
+		if (_n < this->n)
+			return (arg[_n]);
+		throw outofbounds();
 	}
 
 	reference front()
@@ -249,14 +274,15 @@ public :
 		else
 		{
 			resize(n + 1);
-			for (iterator ss = end() - 1; ss > begin() + i; ss--)
+			for (ss = end() - 1; ss > begin() + i; ss--)
 			{
 				*ss = *(ss - 1);
 			}
 			arg[i] = val;
 		}
-		return (begin() + i);
+		return (begin() + i + 1);
 	}
+
 
 	void insert (iterator position, size_type n, const value_type& val)
 	{
@@ -269,6 +295,7 @@ public :
 	template <class InputIterator>
     void insert (iterator position, InputIterator first, InputIterator last)
 	{
+		
 		for (InputIterator tmp = first; tmp < last; tmp++)
 		{
 			position = insert(position, *tmp);
@@ -301,8 +328,8 @@ public :
 		n = 0;
 		cap = 2;
 		arg = allocc.allocate(cap);
-		iterator tmp;
-		for (iterator tmp = first; tmp < last; tmp++)
+		InputIterator tmp;
+		for (InputIterator tmp = first; tmp < last; tmp++)
 		{
 			push_back(*tmp);
 		}
@@ -311,16 +338,103 @@ public :
 	iterator erase (iterator position)
 	{
 		int i = position - begin();
-
 		if (position >= begin() && position < end())
 		{
-			for (iterator ss = end(); ss > position; ss--)
+			for (iterator ss = position; ss < end()- 1; ss++)
 			{
-				*ss = *(ss - 1);
+				*ss = *(ss + 1);
 			}
 			resize(n - 1);
 		}
+		else
+			return (position);
 		return (begin() + i);
+	}
+
+	iterator erase (iterator first, iterator last)
+	{
+		iterator tmp = first;
+		int i = last - first;
+	
+		std::cout << i<< std::endl;
+		for (int j= 0; j < i; j++)
+		{
+			tmp = erase(tmp);
+		}
+		return (tmp);
+	}
+
+	void swap (vector& x)
+	{
+		vector<T> tmp;
+
+		tmp = x;
+		x = *this;
+		*this = tmp;
+	}
+
+	void clear()
+	{
+		allocc.deallocate(arg, cap);
+		n = 0;
+		cap = 3;
+		arg = allocc.allocate(cap);
+	}
+
+	template <class T1>
+	bool operator== (const vector<T1>& lhs)
+	{
+		if(size() != lhs.size())
+			return (0);
+		for (int i = 0; i < size(); i++)
+		{
+			if (this->at(i)!= lhs[i])
+				return (0);
+		}
+		return (1);
+	}
+
+	template <class T1>
+	bool operator!= (const vector<T1>& lhs)
+	{
+		return !(*this == lhs);
+	}
+
+	template <class T1>
+	bool operator< (const vector<T1>& lhs)
+	{
+		int n1 = 0;
+
+		n1 = (size() > lhs.size()?size():lhs.size());
+		for (int i = 0; i < n1; i++)
+		{
+			if (this->at(i) != lhs[i])
+				return (this->at(i) < lhs[i]);
+		}
+		return (size() < lhs.size());
+	}
+
+	template <class T1>
+	bool operator<= (const vector<T1>& lhs)
+	{
+		return (*this < lhs) || *this==lhs;
+	}
+
+	template <class T1>
+	bool operator> (const vector<T1>& lhs)
+	{
+		return (!(*this < lhs))&&!(*this == lhs);
+	}
+
+	template <class T1>
+	bool operator>= (const vector<T1>& lhs)
+	{
+		return !(*this < lhs);
+	}
+
+	size_type max_size() const
+	{
+		return (allocc.max_size());
 	}
 };
 }
