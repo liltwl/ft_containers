@@ -10,6 +10,7 @@
 #include <stack>
 #include <iterator>
 #include <string>
+#include "iterator_traits.hpp"
 
 namespace ft{
     template <class K, class T,class Compare = less<K>, class Alloc = allocator<ft::pair<K,T> > >
@@ -17,18 +18,23 @@ namespace ft{
          public :
             typedef ft::pair<K, T>        value_type;
             typedef Alloc 						allocator_type;
+            typedef allocator_traits< allocator<BST> >         	__alloc_traits;
+            typedef typename __alloc_traits::difference_type		difference_type;
+            typedef typename allocator_traits<Alloc>::pointer        	pointer;
+            typedef typename __alloc_traits::pointer     P;
+            typedef ft::mapiter<P, pointer>			        iterator;
 
         public:
             value_type *m_pair;
-            BST *left, *right;
+            BST *left, *right, *parent;
             allocator_type allocc;
             Compare     c;
         public :
 
-            BST(): m_pair(NULL), left(NULL), right(NULL) {}
+            BST(): m_pair(NULL), left(NULL), right(NULL), parent(NULL) {}
             BST(K first,T second,
                 const allocator_type& alloc = allocator_type()) 
-                : m_pair(nullptr), left(nullptr), right(nullptr), allocc(alloc)
+                : m_pair(nullptr), left(nullptr), right(nullptr), parent(NULL), allocc(alloc)
             {
                 m_pair = allocc.allocate(1);
                 allocc.construct(m_pair, first, second);
@@ -36,11 +42,15 @@ namespace ft{
 
             BST(value_type &pair,
                 const allocator_type& alloc = allocator_type())
-                : m_pair(nullptr), left(nullptr), right(nullptr), allocc(alloc)
+                : m_pair(nullptr), left(nullptr), right(nullptr), parent(NULL), allocc(alloc)
             {
-                m_pair = &pair;
+                m_pair = allocc.allocate(1);
+                allocc.construct(m_pair, pair);
             }
-
+            ~BST()
+            {
+                allocc.deallocate(m_pair, 1);
+            }
             BST *find(K key)
             {
                 BST *root = this;
@@ -65,9 +75,11 @@ namespace ft{
                 }
                 if (c(root->m_pair->first, pair.first)){
                     root->right = insert(root->right, pair);
+                    root->right->parent = root;
                 }
                 else {
                     root->left = insert(root->left, pair);
+                    root->left->parent = root;
                 }
                 return root;
             }
@@ -122,12 +134,12 @@ namespace ft{
                     if (root->left == NULL)
                     {
                         temp = root->right;
-                        free(root);
+                        delete root;
                         return temp;
                     } else if (root->right == NULL) 
                     {
                         temp = root->left;
-                        free(root);
+                        delete (root);
                         return temp;
                     }
                     temp = minValueNode(root->right);
@@ -139,5 +151,30 @@ namespace ft{
                 return root;
             }
 
+            BST *getnextnode(BST *key)
+            {
+                BST *tmp = NULL;
+
+                BST *root = key;
+                while (root->parent != NULL)
+                {
+                    root = root->parent;
+                }
+                while (root != NULL) 
+                {
+                    if (root->m_pair->first > key->m_pair->first)
+                    {
+                    tmp = root;
+                    root = root->left;
+                    }
+                    else
+                    root = root->right;
+                }
+                return (tmp);
+            }
+            iterator begin()
+            {
+                return (this);
+            }
     };
 }

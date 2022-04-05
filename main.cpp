@@ -65,20 +65,23 @@ int main()
 
 //     for (; ll < ll2 ; ll++)
 //         std::cout << *(ll) << std::endl;
-    allocator<ft::pair<string ,string> > alloc;
-    ft::pair<string, string> *p = alloc.allocate(1);
+    allocator<std::pair<string ,string> > alloc;
+    std::pair<string, string> *p = alloc.allocate(1);
     alloc.construct(p, "1","ded");
-    ft::pair<string, string> p2("1", "cw");
-    ft::pair<string, string> p3("4", "cw");
-    // map<int, string> m;
-    // m.insert(*p);
+    ft::pair<string, string> p2("3", "cw");
+    ft::pair<string, string> p3("1", "cw");
+    map<string, string> m;
+    m.insert(*p);
+    map<string, string>::iterator it1 = m.begin();
     // alloc.deallocate(p, 1);
-    // cout << m.begin()->first << " " << m.end()->second << endl;
+    // cout << m.begin()->first << " " << m.begin()->second << endl;
 
 
-    ft::BST<string , string> tmp(p2);
-    tmp.insert(&tmp, "1", "cdcdc");
-    cout << tmp.left->m_pair->first << " " << tmp.left->m_pair->second << endl;
+    ft::BST<string , string> tmp(p3);
+    tmp.insert(&tmp, "4", "cdcdc");
+    ft::BST<string , string>::iterator it=tmp.begin();
+    cout << it->first << " " << it->second << endl;
+    
     // ft::vector<std::string> s(7, "wesh");
     // ft::vector<std::string> f(5, "asat");
     

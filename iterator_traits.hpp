@@ -28,6 +28,7 @@ struct iterator_traits<T*>
     typedef ptrdiff_t difference_type;
     typedef T value_type;
     typedef T* pointer;
+    typedef typename T::pointer point;
     typedef T& reference;
     typedef random_access_iterator_tag iterator_category;
 };
@@ -42,6 +43,60 @@ struct iterator
     typedef Pointer   pointer;
     typedef Reference reference;
     typedef Category  iterator_category;
+};
+
+template <class ter, class K>
+class mapiter
+{
+    public:
+    typedef ter                                                         iterator_type;
+    typedef typename iterator_traits<iterator_type>::iterator_category iterator_category;
+    typedef typename iterator_traits<iterator_type>::value_type        value_type;
+    typedef typename iterator_traits<iterator_type>::difference_type   difference_type;
+    typedef K           pointer;
+    typedef typename iterator_traits<iterator_type>::reference         reference;
+
+    private:
+        iterator_type i;
+    public :
+        mapiter(): i(NULL){}
+        mapiter(iterator_type it): i(it){}
+        template <class Iter, class I>
+        mapiter (const mapiter<Iter, I>& rev_it): i(rev_it.base()) {}
+
+        iterator_type base() const {return (i);}
+
+
+        reference operator*() const{return(*i);}
+    
+        mapiter& operator++()
+        {
+            i = i->getnextnode(i);
+            return *this;
+        }
+        mapiter  operator++(int){
+            mapiter tmp(*this);
+            i = i->getnextnode(i);
+            return (tmp);
+        }
+        mapiter& operator+= (difference_type n){
+            i += n;
+            return *this;
+        }
+        mapiter& operator--(){
+            i--;
+        return *this;}
+        mapiter  operator--(int){
+            mapiter tmp(*this);
+            i--;
+            return (tmp);
+        }
+        pointer operator->() const{return i->m_pair;}
+        template <class Iterator, class I>
+        bool operator== (const mapiter<Iterator, I>& lhs){return (i == (lhs.i));}
+        template <class Iterator, class I>
+        bool operator!= (const mapiter<Iterator, I>& lhs){return (i != (lhs.i));}
+
 };
 
 template <class ter>
@@ -68,7 +123,7 @@ class myiter
 
         reference operator*() const{return(*i);}
     
-        myiter operator+ (difference_type n) const{return (i + n);}
+        myiter operator+(difference_type n) const{return (i + n);}
         // template <class iter>
         // difference_type operator+(const myiter<iter>& s2) {return (i + (s2.base()));}
         myiter& operator++(){i++;return *this;}

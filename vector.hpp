@@ -118,7 +118,6 @@ public :
 		return (arg);
 	}
 
-
 	reverse_iterator rbegin()
 	{
 		return (reverse_iterator(end()));
