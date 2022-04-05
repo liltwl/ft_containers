@@ -72,16 +72,25 @@ int main()
     ft::pair<string, string> p3("1", "cw");
     map<string, string> m;
     m.insert(*p);
-    map<string, string>::iterator it1 = m.begin();
-    // alloc.deallocate(p, 1);
-    // cout << m.begin()->first << " " << m.begin()->second << endl;
+    // map<string, string>::iterator it1 = m.begin();
+    // // alloc.deallocate(p, 1);
+    //  cout << m.end()->first << " " << m.end()->second << endl;
 
 
-    ft::BST<string , string> tmp(p3);
-    tmp.insert(&tmp, "4", "cdcdc");
+    ft::BST<string , string> tmp1(p3);
+    //tmp1.insert(&tmp1, "4", "cdcdc");
+    tmp1.insert(&tmp1, p2);
+    tmp1.insert(&tmp1, p2);
+    //cout << "wefwef"<<endl;
+    ft::BST<string , string> tmp(tmp1);
+    //tmp.deleteNode(&tmp, "4");
     ft::BST<string , string>::iterator it=tmp.begin();
-    cout << it->first << " " << it->second << endl;
-    
+    cout << tmp.size(&tmp)<< endl;
+    while (it != tmp.end())
+    {
+        it++;
+        cout << it->first << " " << it->second << endl;
+    }
     // ft::vector<std::string> s(7, "wesh");
     // ft::vector<std::string> f(5, "asat");
     

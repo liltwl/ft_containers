@@ -53,7 +53,7 @@ class mapiter
     typedef typename iterator_traits<iterator_type>::iterator_category iterator_category;
     typedef typename iterator_traits<iterator_type>::value_type        value_type;
     typedef typename iterator_traits<iterator_type>::difference_type   difference_type;
-    typedef K           pointer;
+    typedef K                                                           pointer;
     typedef typename iterator_traits<iterator_type>::reference         reference;
 
     private:
@@ -79,16 +79,12 @@ class mapiter
             i = i->getnextnode(i);
             return (tmp);
         }
-        mapiter& operator+= (difference_type n){
-            i += n;
-            return *this;
-        }
         mapiter& operator--(){
-            i--;
+            i = i->getprevnode(i);
         return *this;}
         mapiter  operator--(int){
             mapiter tmp(*this);
-            i--;
+            i = i->getprevnode(i);
             return (tmp);
         }
         pointer operator->() const{return i->m_pair;}
