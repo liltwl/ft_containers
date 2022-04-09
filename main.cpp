@@ -67,29 +67,41 @@ int main()
 //         std::cout << *(ll) << std::endl;
     allocator<std::pair<string ,string> > alloc;
     std::pair<string, string> *p = alloc.allocate(1);
-    alloc.construct(p, "1","ded");
+    alloc.construct(p, "","");
     ft::pair<string, string> p2("3", "cw");
-    ft::pair<string, string> p3("1", "cw");
+    ft::pair<string, string> p3("7", "cw");
     map<string, string> m;
     m.insert(*p);
-    // map<string, string>::iterator it1 = m.begin();
+    // m.insert(p2);
+    // m.insert(p3);
+
+    // map<string, string>::iterator it = m.begin();
+    // it++;
+    // m.insert(it, *p);
     // // alloc.deallocate(p, 1);
-    //  cout << m.end()->first << " " << m.end()->second << endl;
+    // //  cout << m.end()->first << " " << m.end()->second << endl;
 
-
+    // while (it != m.end())
+    // {
+    //     cout << it->first << " " << it->second << endl;
+    //     it++;
+    // }
     ft::BST<string , string> tmp1(p3);
     //tmp1.insert(&tmp1, "4", "cdcdc");
-    tmp1.insert(&tmp1, p2);
-    tmp1.insert(&tmp1, p2);
-    //cout << "wefwef"<<endl;
-    ft::BST<string , string> tmp(tmp1);
+    // tmp1.insert(&tmp1, p2);
+    // tmp1.insert(&tmp1, p2);
+    ft::map<string, string> mm;
+    // cout << "wefwef"<<endl;
+    mm.insert(p2);
+    ft::BST<string , string> tmp;
+    tmp = tmp1;
     //tmp.deleteNode(&tmp, "4");
     ft::BST<string , string>::iterator it=tmp.begin();
-    cout << tmp.size(&tmp)<< endl;
+    cout << m.end()->first << "  rref"<< endl;
     while (it != tmp.end())
     {
-        it++;
         cout << it->first << " " << it->second << endl;
+        it++;
     }
     // ft::vector<std::string> s(7, "wesh");
     // ft::vector<std::string> f(5, "asat");

@@ -16,15 +16,15 @@ namespace ft{
     template <class K, class T,class Compare = less<K>, class Alloc = allocator<ft::pair<K,T> > >
     class BST {
          public :
-            typedef ft::pair<K, T>                              value_type;
+            typedef ft::pair<K, T>                                  value_type;
             typedef Alloc 						                    allocator_type;
-            typedef Compare                                             key_compare;
+            typedef Compare                                         key_compare;
             typedef allocator_traits<allocator<BST> >         	    __alloc_traits;
             typedef typename __alloc_traits::difference_type		difference_type;
-            typedef typename allocator_traits<Alloc>::pointer        	pointer;
-            typedef typename allocator_traits<Alloc>::size_type                    size_type;
-            typedef typename __alloc_traits::pointer             P;
-            typedef ft::mapiter<P, pointer>			            iterator;
+            typedef typename allocator_traits<Alloc>::pointer       pointer;
+            typedef typename allocator_traits<Alloc>::size_type     size_type;
+            typedef typename __alloc_traits::pointer                P;
+            typedef ft::mapiter<P, pointer>			                iterator;
 
         public:
             value_type *m_pair;
@@ -43,7 +43,7 @@ namespace ft{
                 allocc.construct(m_pair, first, second);
             }
 
-            BST(value_type &pair, const key_compare& comp= key_compare(),
+            BST(const value_type &pair, const key_compare& comp= key_compare(),
                 const allocator_type& alloc= allocator_type())
                 : m_pair(NULL), left(NULL), right(NULL), parent(NULL), allocc(alloc), c(comp)
             {
@@ -65,13 +65,27 @@ namespace ft{
                 allocc.deallocate(m_pair, 1);
             }
 
-            BST *find(K key)
+            BST& operator= (BST& x)
+            {  
+                BST* tmp;
+                clear(this);
+                tmp = treecopy(&x);
+                m_pair = tmp->m_pair;
+                left = tmp->left;
+                right = tmp->right;
+                return (*this);
+            }
+            BST *find(K key, BST* tmp)
             {
-                BST *root = this;
+                BST *root = tmp;
+				if (tmp == NULL)
+					return NULL;
                 while (root->parent != NULL)
                 {
                     root = root->parent;
                 }
+                if (root->m_pair == NULL)
+					return NULL;
                 while (root)
                 {
                     if (root->m_pair->first == key)
@@ -80,17 +94,21 @@ namespace ft{
                         root = root->left;
                     else
                         root = root->right;
-                }
-                cout <<  "Dwed" << endl;
+				}
                 return (NULL);
             }
 
-            BST*   insert(BST* root, value_type &pair)
+            BST*   insert(BST* root, const value_type &pair)
             {
-                if (root->find(pair.first)!= NULL)
+                if (find(pair.first, root)!= NULL)
                     return (NULL);
                 if (!root) {
                     return new BST(pair, c, allocc);
+                }
+                else if (root->m_pair == NULL) //khassak tkaal had lkhdma hiya t9ad chi zahad ykon fl end o inserti chi haja
+                {
+                    right = new BST(pair, c, allocc);
+                    right->parent = root;
                 }
                 if (c(root->m_pair->first, pair.first)){
                     root->right = insert(root->right, pair);
@@ -105,7 +123,7 @@ namespace ft{
 
             BST*   insert(BST* root, K first,T second)
             {
-                if (root->find(first) != NULL)
+                if (root->find(first, root) != NULL)
                     return (NULL);
                 if (!root) {
                     return new BST(first, second, c, allocc);
@@ -238,7 +256,7 @@ namespace ft{
             {
                 size_type i = 0;
 
-                if (key != NULL)
+                if (key != NULL && key->m_pair != NULL)
                     i++;
                 if (key->right != NULL)
                     i += size(key->right);
@@ -247,6 +265,16 @@ namespace ft{
                 return i;
             }
 
+            void clear(BST * root)
+            {
+                if (root == NULL || root->m_pair == NULL)
+                    return ;
+                if (root->left != NULL)
+                    clear(root->left);
+                if (root->right != NULL)
+                    clear(root->right);
+                delete root;
+            }
             iterator begin()
             {
                 return (this);
@@ -259,12 +287,12 @@ namespace ft{
 
 
 
-    template <class K, class T,class Compare = less<K>, class Alloc = allocator<ft::pair<const K,T> > >
+    template <class K, class T,class Compare = less<K>, class Alloc = allocator<ft::pair<K,T> > >
     class map{
         public :
             typedef K                                                   key_type;
             typedef T                                                   mapped_type;
-            typedef pair<const key_type, mapped_type>                   value_type;
+            typedef ft::pair<key_type, mapped_type>                   value_type;
             typedef Compare                                             key_compare;
             typedef Alloc                                               allocator_type;
             typedef value_type&                                         reference;
@@ -278,7 +306,7 @@ namespace ft{
             typedef typename alloc_traits::size_type                    size_type;
             typedef typename alloc_traits::difference_type              difference_type;
 
-            typedef ft::mapiter<typename __base::P, pointer>	        iterator;
+            typedef typename __base::iterator               	        iterator;
             typedef ft::mapiter<typename __base::P, const_pointer>	    const_iterator;
             typedef ft::reverse_iterator<iterator>       		        reverse_iterator;
             typedef ft::reverse_iterator<const_iterator>   		        const_reverse_iterator;
@@ -299,11 +327,63 @@ namespace ft{
                 const allocator_type& alloc = allocator_type()): n(0), c(comp), allocc(alloc), tree(c, allocc)
             {
                 insert (first, last);
+				n = tree.size(tree);
             }
 
             map (const map& x) : tree(x.tree)
             {
-                
+                n = tree.size(tree);
+            }
+
+			~map(){}
+
+			map& operator= (const map& x)
+            {
+                tree = x.tree;
+                n = tree.size(tree);
+                return *this;
+            }
+
+            bool empty() const
+            {
+                if (n == 0)
+                    return true;
+                return false;
+            }
+
+            size_type size() const
+            {
+                return n;
+            }
+
+            pair<iterator,bool> 
+            insert (const value_type& val)
+            {
+                if (tree.insert(&tree, val) == NULL)
+                {
+                    return (ft::make_pair<iterator,bool>(NULL, false));
+                }
+                cout << "wefwef"<<endl;
+
+                n++;
+                iterator it = tree.find(val.first, &tree);
+                return (ft::make_pair<iterator,bool>(it, true));
+            }
+
+            iterator insert (iterator position, const value_type& val)
+            {
+                tree.insert(&tree.find(position->first), val);
+                n++;
+            }
+            template <class InputIterator>
+            void insert (InputIterator first, InputIterator last)
+            {
+                while (first != last)
+                {
+                    tree.insert(tree, first->first, first->second);
+                    n++;
+                    first++;
+                }
             }
     };
 }
