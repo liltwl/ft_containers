@@ -34,7 +34,9 @@ namespace ft{
         public :
 
             BST(const key_compare& comp = key_compare(),
-              const allocator_type& alloc = allocator_type()): m_pair(NULL), left(NULL), right(NULL), parent(NULL), allocc(alloc), c(comp) {}
+              const allocator_type& alloc = allocator_type()): m_pair(NULL), left(NULL), right(NULL), parent(NULL), allocc(alloc), c(comp) {
+                  m_pair = allocc.allocate(1);
+              }
             BST(K first,T second, const key_compare& comp= key_compare(),
                 const allocator_type& alloc= allocator_type()) 
                 : m_pair(NULL), left(NULL), right(NULL), parent(NULL), allocc(alloc), c(comp)
@@ -84,8 +86,7 @@ namespace ft{
                 {
                     root = root->parent;
                 }
-                if (root->m_pair == NULL)
-					return NULL;
+                root = root->right;
                 while (root)
                 {
                     if (root->m_pair->first == key)
@@ -105,11 +106,6 @@ namespace ft{
                 if (!root) {
                     return new BST(pair, c, allocc);
                 }
-                else if (root->m_pair == NULL) //khassak tkaal had lkhdma hiya t9ad chi zahad ykon fl end o inserti chi haja
-                {
-                    right = new BST(pair, c, allocc);
-                    right->parent = root;
-                }
                 if (c(root->m_pair->first, pair.first)){
                     root->right = insert(root->right, pair);
                     root->right->parent = root;
@@ -123,16 +119,18 @@ namespace ft{
 
             BST*   insert(BST* root, K first,T second)
             {
-                if (root->find(first, root) != NULL)
+                if (find(first, root) != NULL)
                     return (NULL);
                 if (!root) {
                     return new BST(first, second, c, allocc);
                 }
-                if (c(root->m_pair->first, first)){
+                if (root->m_pair->first < first){
                     root->right = insert(root->right, first, second);
+                    root->right->parent = root;
                 }
                 else {
                     root->left = insert(root->left, first, second);
+                    root->left->parent = root;
                 }
             
                 return root;
@@ -140,19 +138,47 @@ namespace ft{
 
             BST*    maxkey(BST* root)
             {
-                BST *current = this;
+                BST *current = root;
 
+                
+                if (current)
+                while (current->parent  != NULL)
+                {
+                    current = current->parent;
+                }
+                current = current->right;
                 while (current && current->right != NULL)
+                {
                     current = current->right;
+                }
                 return current;
             }
 
             BST*    minkey(BST* root)
             {
-                BST *current = this;
+                BST *current = root;
+                
+                if (current)
+                while (current->parent != NULL)
+                {
+                    current = current->parent;
+                }
+                current = current->right;
+                while (current && current->left != NULL)
+                {
+                    current = current->left;
+                }
+                return current;
+            }
+
+            BST*    mink(BST* root)
+            {
+                BST *current = root;
 
                 while (current && current->left != NULL)
+                {
                     current = current->left;
+                }
                 return current;
             }
 
@@ -179,7 +205,7 @@ namespace ft{
                         delete (root);
                         return temp;
                     }
-                    temp = minkey(root->right);
+                    temp = mink(root->right);
 
                     root->m_pair = temp->m_pair;
 
@@ -199,9 +225,10 @@ namespace ft{
                 {
                     root = root->parent;
                 }
+                root = root->right;
                 while (root != NULL) 
                 {
-                    if (root->m_pair->first > key->m_pair->first)
+                    if (!c(root->m_pair->first, key->m_pair->first))
                     {
                         tmp = root;
                         root = root->left;
@@ -221,12 +248,13 @@ namespace ft{
                 {
                     root = root->parent;
                 }
+                root = root->right;
                 while (root != NULL) 
                 {
                     if (root->m_pair->first < key->m_pair->first)
                     {
-                    tmp = root;
-                    root = root->right;
+                        tmp = root;
+                        root = root->right;
                     }
                     else
                     root = root->left;
@@ -267,7 +295,7 @@ namespace ft{
 
             void clear(BST * root)
             {
-                if (root == NULL || root->m_pair == NULL)
+                if (root == NULL || root->parent == NULL)
                     return ;
                 if (root->left != NULL)
                     clear(root->left);
@@ -275,13 +303,17 @@ namespace ft{
                     clear(root->right);
                 delete root;
             }
-            iterator begin()
+            iterator begin(BST* root)
             {
-                return (this);
+                return (minkey(root));
             }
-            iterator end()
+            iterator end(BST* root)
             {
-                return (maxkey(this));
+                while (root->parent != NULL)
+                {
+                    root = root->parent;
+                }
+                return (root);
             }
     };
 
@@ -319,7 +351,9 @@ namespace ft{
         public :
 
             map (const key_compare& comp = key_compare(),
-              const allocator_type& alloc = allocator_type()) : n(0), c(comp), allocc(alloc), tree(c, allocc) {}
+              const allocator_type& alloc = allocator_type()) : n(0), c(comp), allocc(alloc), tree(c, allocc) {
+                   
+              }
 
             template <class InputIterator>
             map (InputIterator first, InputIterator last,
@@ -356,15 +390,37 @@ namespace ft{
                 return n;
             }
 
+            iterator begin()
+            {
+                return tree.minkey(tree.right);
+            }
+
+            iterator end()
+            {
+                return &tree;
+            }
+            
+
+            mapped_type& operator[] (const key_type& k)
+            {
+                __base *tmp = tree.find(k, tree.right);
+                if (tmp == NULL)
+                {
+                    tree.right = tree.insert(tree.right, k, mapped_type());
+                    tree.right->parent = &tree;
+                    tmp = tree.find(k, tree.right);
+                }
+                return (tmp->m_pair->second);
+            }
+
             pair<iterator,bool> 
             insert (const value_type& val)
             {
-                if (tree.insert(&tree, val) == NULL)
+                if ((tree.right = tree.insert(tree.right, val)) == NULL)
                 {
                     return (ft::make_pair<iterator,bool>(NULL, false));
                 }
-                cout << "wefwef"<<endl;
-
+                tree.right->parent = &tree;
                 n++;
                 iterator it = tree.find(val.first, &tree);
                 return (ft::make_pair<iterator,bool>(it, true));
@@ -372,7 +428,8 @@ namespace ft{
 
             iterator insert (iterator position, const value_type& val)
             {
-                tree.insert(&tree.find(position->first), val);
+                tree.right =tree.insert(&tree.find(position->first), val);
+                tree.right->parent = &tree;
                 n++;
             }
             template <class InputIterator>
@@ -380,10 +437,12 @@ namespace ft{
             {
                 while (first != last)
                 {
-                    tree.insert(tree, first->first, first->second);
+                    tree.right = tree.insert(tree, first->first, first->second);
                     n++;
+                    tree.right->parent = &tree;
                     first++;
                 }
             }
+
     };
 }

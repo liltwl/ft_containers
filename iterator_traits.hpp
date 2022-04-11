@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iterator>
-
+using namespace std;
 
 namespace ft
 {
@@ -71,20 +71,38 @@ class mapiter
     
         mapiter& operator++()
         {
-            i = i->getnextnode(i);
+             if (i->m_pair == (i->maxkey(i))->m_pair || i == (i->end(i)).base())
+                *this = i->end(i);
+            else
+                i = i->getnextnode(i);
             return *this;
         }
         mapiter  operator++(int){
             mapiter tmp(*this);
-            i = i->getnextnode(i);
+
+            if (i->m_pair == (i->maxkey(i))->m_pair || i == (i->end(i)).base())
+                *this = i->end(i);
+            else
+                i = i->getnextnode(i);
             return (tmp);
         }
         mapiter& operator--(){
-            i = i->getprevnode(i);
+             if (i == (i->end(i)).base())
+                i = i->maxkey(i);
+            else if (i->m_pair != (i->minkey(i))->m_pair)
+                i = i->getprevnode(i);
         return *this;}
         mapiter  operator--(int){
             mapiter tmp(*this);
-            i = i->getprevnode(i);
+            cout << (i->maxkey(i))->m_pair->first << "****" << endl;
+            if (i->m_pair == (i->end(i)).base()->m_pair)
+            {
+                i = i->maxkey(i);
+            }
+            else if (i->m_pair != (i->minkey(i))->m_pair)
+            {
+                i = i->getprevnode(i);
+            }
             return (tmp);
         }
         pointer operator->() const{return i->m_pair;}
