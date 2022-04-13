@@ -65,22 +65,23 @@ int main()
 
 //     for (; ll < ll2 ; ll++)
 //         std::cout << *(ll) << std::endl;
-    allocator<std::pair<string ,string> > alloc;
-    std::pair<string, string> *p = alloc.allocate(1);
-    alloc.construct(p, "1","dee");
-    std::pair<string, string> p2("3", "cw");
-    std::pair<string, string> p3("7", "cw");
-    map<string, string> m;
-    m.insert(*p);
-    m.insert(p2);
-    m.insert(p3);
-    cout << m["199"] << endl;
-    map<string , string>::iterator it = m.end();
-    while (it != m.begin())
-    {
-        it--;
-        cout << it->first << " " << it->second << endl;
-    }
+    allocator<ft::pair<string ,string> > alloc;
+    ft::pair<string, string> *p = alloc.allocate(1);
+    alloc.construct(p, "1", "dee");
+    ft::pair<string, string> p2("3", "cw");
+    ft::pair<string, string> p3("7", "cw");
+    // map<string, string> m;
+    // m.insert(*p);
+    // m.insert(p2);
+    // m.insert(p3);
+    // cout << m["199"] << endl;
+    // map<string , string>::iterator it = m.end();
+    // mm.erase(i);
+    // while (it != m.begin())
+    // {
+    //     it--;
+    //     cout << it->first << " " << it->second << endl;
+    // }
     // map<string, string>::iterator it = m.begin();
     // it++;
     // m.insert(it, *p);
@@ -92,26 +93,30 @@ int main()
     //     cout << it->first << " " << it->second << endl;
     //     it++;
     // }
-    // ft::BST<string , string> tmp1(p3);
-    // //tmp1.insert(&tmp1, "4", "cdcdc");
-    // // tmp1.insert(&tmp1, p2);
-    // // tmp1.insert(&tmp1, p2);
-    // ft::map<string, string> mm;
-    // // cout << "wefwef"<<endl;
-    // mm.insert(p2);
-    // mm.insert(p3);
-    // mm.insert(*p);
-    // ft::BST<string , string> tmp;
-    // tmp = tmp1;
-    // mm["199"]  = "feff";
-    // cout << mm["6"] << " " << mm["7"] << endl; 
-    // tmp.deleteNode(&tmp, "4");
-    // // ft::map<string , string>::iterator it = mm.end();
-    // while (it != mm.begin())
-    // {
-    //     it--;
-    //     cout << it->first << " -> " << it->second << endl;
-    // }
+    ft::BST<string , string> tmp1(p3);
+    //tmp1.insert(&tmp1, "4", "cdcdc");
+    // tmp1.insert(&tmp1, p2);
+    // tmp1.insert(&tmp1, p2);
+    ft::map<string, string> mm;
+    // cout << "wefwef"<<endl;
+    mm.insert(p2);
+    mm.insert(p3);
+    mm.insert(*p);
+    ft::BST<string , string> tmp;
+    tmp = tmp1;
+    mm["199"]  = "feff";
+    cout << mm["6"] << " " << mm["7"] << endl; 
+    tmp.deleteNode(&tmp, "4");
+    //mm.clear();
+    cout << mm.lower_bound("199")->first << " -> " << mm.count("7") << endl;
+    ft::map<string , string>::iterator it = mm.begin();
+
+    it = mm.end();
+    while (it != mm.begin())
+    {
+        it--;
+        cout << (*it)->first << " -> " << it->second << endl;
+    }
 
     // ft::vector<std::string> s(7, "wesh");
     // ft::vector<std::string> f(5, "asat");

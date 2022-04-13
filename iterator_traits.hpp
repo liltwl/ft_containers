@@ -19,7 +19,7 @@ struct iterator_traits
     typedef typename Iterator::pointer pointer;
     typedef typename Iterator::reference reference;
     //typedef typename Iterator::const_pointer   	const_pointer;
-    typedef typename Iterator::iterator_category iterator_category;
+    t//ypedef typename Iterator::iterator_category iterator_category;
 };
 
 template<class T>
@@ -50,11 +50,12 @@ class mapiter
 {
     public:
     typedef ter                                                         iterator_type;
-    typedef typename iterator_traits<iterator_type>::iterator_category iterator_category;
-    typedef typename iterator_traits<iterator_type>::value_type        value_type;
-    typedef typename iterator_traits<iterator_type>::difference_type   difference_type;
-    typedef K                                                           pointer;
-    typedef typename iterator_traits<iterator_type>::reference         reference;
+    typedef typename iterator_traits<iterator_type>::iterator_category  iterator_category;
+    typedef typename iterator_traits<iterator_type>::value_type         value_type;
+    typedef typename iterator_traits<iterator_type>::difference_type    difference_type;
+    typedef typename K::pointer                                         pointer;
+    typedef typename iterator_traits<K>::reference          reference;
+
 
     private:
         iterator_type i;
@@ -67,11 +68,11 @@ class mapiter
         iterator_type base() const {return (i);}
 
 
-        reference operator*() const{return(*i);}
+        reference operator*() const{return(*(i->m_pair));}
     
         mapiter& operator++()
         {
-             if (i->m_pair == (i->maxkey(i))->m_pair || i == (i->end(i)).base())
+             if (i == (i->maxkey(i)) || i == (i->end(i)).base())
                 *this = i->end(i);
             else
                 i = i->getnextnode(i);
@@ -80,7 +81,7 @@ class mapiter
         mapiter  operator++(int){
             mapiter tmp(*this);
 
-            if (i->m_pair == (i->maxkey(i))->m_pair || i == (i->end(i)).base())
+            if (i == (i->maxkey(i)) || i == (i->end(i)).base())
                 *this = i->end(i);
             else
                 i = i->getnextnode(i);
@@ -94,7 +95,6 @@ class mapiter
         return *this;}
         mapiter  operator--(int){
             mapiter tmp(*this);
-            cout << (i->maxkey(i))->m_pair->first << "****" << endl;
             if (i->m_pair == (i->end(i)).base()->m_pair)
             {
                 i = i->maxkey(i);

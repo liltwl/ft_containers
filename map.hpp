@@ -20,11 +20,14 @@ namespace ft{
             typedef Alloc 						                    allocator_type;
             typedef Compare                                         key_compare;
             typedef allocator_traits<allocator<BST> >         	    __alloc_traits;
+            typedef allocator_traits<Alloc>                 	    alloc_traits;
             typedef typename __alloc_traits::difference_type		difference_type;
-            typedef typename allocator_traits<Alloc>::pointer       pointer;
-            typedef typename allocator_traits<Alloc>::size_type     size_type;
+            typedef typename alloc_traits::pointer                  pointer;
+            typedef typename alloc_traits::const_pointer            const_pointer;
+            typedef typename alloc_traits::size_type                size_type;
             typedef typename __alloc_traits::pointer                P;
-            typedef ft::mapiter<P, pointer>			                iterator;
+            typedef ft::mapiter<P, alloc_traits>			        iterator;
+            typedef ft::mapiter<P, alloc_traits>			        const_iterator;
 
         public:
             value_type *m_pair;
@@ -78,6 +81,28 @@ namespace ft{
                 return (*this);
             }
             BST *find(K key, BST* tmp)
+            {
+                BST *root = tmp;
+				if (tmp == NULL)
+					return NULL;
+                while (root->parent != NULL)
+                {
+                    root = root->parent;
+                }
+                root = root->right;
+                while (root)
+                {
+                    if (root->m_pair->first == key)
+                        return (root);
+                    if (key < root->m_pair->first)
+                        root = root->left;
+                    else
+                        root = root->right;
+				}
+                return (NULL);
+            }
+
+            BST *find(K key, BST* tmp) const
             {
                 BST *root = tmp;
 				if (tmp == NULL)
@@ -158,7 +183,7 @@ namespace ft{
             {
                 BST *current = root;
                 
-                if (current)
+                if (!current) return  NULL;
                 while (current->parent != NULL)
                 {
                     current = current->parent;
@@ -239,7 +264,32 @@ namespace ft{
                 return (tmp);
             }
 
-            BST *getprevnode(BST *key)
+            BST *getnextnode(K kk, BST *key) const
+            {
+                BST *tmp = NULL;
+
+                if (key == NULL)
+                    return NULL;
+                BST *root = key;
+                while (root->parent != NULL)
+                {
+                    root = root->parent;
+                }
+                root = root->right;
+                while (root != NULL) 
+                {
+                    if (c(kk ,root->m_pair->first))
+                    {
+                        tmp = root;
+                        root = root->left;
+                    }
+                    else
+                        root = root->right;
+                }
+                return (tmp);
+            }
+
+            BST *getprevnode(BST *key) const
             {
                 BST *tmp = NULL;
 
@@ -252,6 +302,29 @@ namespace ft{
                 while (root != NULL) 
                 {
                     if (root->m_pair->first < key->m_pair->first)
+                    {
+                        tmp = root;
+                        root = root->right;
+                    }
+                    else
+                    root = root->left;
+                }
+                return (tmp);
+            }
+
+            BST *getprevnode(K kk, BST *key) const
+            {
+                BST *tmp = NULL;
+
+                BST *root = key;
+                while (root->parent != NULL)
+                {
+                    root = root->parent;
+                }
+                root = root->right;
+                while (root != NULL) 
+                {
+                    if (c(root->m_pair->first , kk))
                     {
                         tmp = root;
                         root = root->right;
@@ -339,9 +412,25 @@ namespace ft{
             typedef typename alloc_traits::difference_type              difference_type;
 
             typedef typename __base::iterator               	        iterator;
-            typedef ft::mapiter<typename __base::P, const_pointer>	    const_iterator;
+            typedef typename __base::const_iterator                   	    const_iterator;
             typedef ft::reverse_iterator<iterator>       		        reverse_iterator;
             typedef ft::reverse_iterator<const_iterator>   		        const_reverse_iterator;
+
+            class value_compare
+            { 
+				friend class map;
+                protected:
+                Compare comp;
+                value_compare (Compare c) : comp(c) {}
+                public  :
+                typedef bool result_type;
+                typedef value_type first_argument_type;
+                typedef value_type second_argument_type;
+                result_type operator() (const first_argument_type& x, const second_argument_type& y) const
+                {
+                    return comp(x.first, y.first);
+                }
+            };
         private :
             size_type   n;
             __base     tree;
@@ -361,20 +450,22 @@ namespace ft{
                 const allocator_type& alloc = allocator_type()): n(0), c(comp), allocc(alloc), tree(c, allocc)
             {
                 insert (first, last);
-				n = tree.size(tree);
+				n = tree.size(tree.right);
             }
 
-            map (const map& x) : tree(x.tree)
+            map (const map& x) : tree(x.c, x.allocc)
             {
-                n = tree.size(tree);
+                *this = x;
+                //n = tree.size(tree.right);
             }
 
 			~map(){}
 
 			map& operator= (const map& x)
             {
-                tree = x.tree;
-                n = tree.size(tree);
+                clear();
+                insert (x.begin(), x.end());
+                n = tree.size(tree.right);
                 return *this;
             }
 
@@ -390,8 +481,15 @@ namespace ft{
                 return n;
             }
 
+            size_type max_size() const
+            {
+                return (allocc.max_size());
+            }
+
             iterator begin()
             {
+                if (n==0)
+                    return &tree;
                 return tree.minkey(tree.right);
             }
 
@@ -403,12 +501,12 @@ namespace ft{
 
             mapped_type& operator[] (const key_type& k)
             {
-                __base *tmp = tree.find(k, tree.right);
+                __base *tmp = tree.find(key_type(k), tree.right);
                 if (tmp == NULL)
                 {
                     tree.right = tree.insert(tree.right, k, mapped_type());
                     tree.right->parent = &tree;
-                    tmp = tree.find(k, tree.right);
+                    tmp = tree.find(key_type(k), tree.right);
                 }
                 return (tmp->m_pair->second);
             }
@@ -416,10 +514,12 @@ namespace ft{
             pair<iterator,bool> 
             insert (const value_type& val)
             {
-                if ((tree.right = tree.insert(tree.right, val)) == NULL)
+                __base *tmp = tree.insert(tree.right, val);
+                if ((tmp) == NULL)
                 {
                     return (ft::make_pair<iterator,bool>(NULL, false));
                 }
+                tree.right  = tmp;
                 tree.right->parent = &tree;
                 n++;
                 iterator it = tree.find(val.first, &tree);
@@ -428,21 +528,117 @@ namespace ft{
 
             iterator insert (iterator position, const value_type& val)
             {
-                tree.right =tree.insert(&tree.find(position->first), val);
+                tree.right =tree.insert(tree.find(position->first,tree.right), value_type(val));
                 tree.right->parent = &tree;
                 n++;
+                return (tree.find(val.first,tree.right));
             }
+
             template <class InputIterator>
             void insert (InputIterator first, InputIterator last)
             {
                 while (first != last)
                 {
-                    tree.right = tree.insert(tree, first->first, first->second);
-                    n++;
-                    tree.right->parent = &tree;
+                    insert (*first);
                     first++;
                 }
             }
+            
+            void clear()
+            {
+                tree.clear(tree.right);
+                n = 0;
+            }
 
+            void swap (map& x)
+            {
+                map tmp;
+
+                tmp = x;
+                x = *this;
+                *this = tmp;
+            }
+
+            key_compare key_comp() const
+            {
+                return c;
+            }
+
+            value_compare value_comp() const
+            {
+                return (this->value_compare);
+            }
+            iterator find (const key_type& k)
+            {
+                __base *tmp = tree.find(key_type(k), tree.right);
+                if (tmp == NULL)
+                    return (&tree);
+                return (tmp);
+            }
+            const_iterator find (const key_type& k) const
+            {
+                __base *tmp = tree.find(key_type(k), tree.right);
+                if (tmp == NULL)
+                    return (&tree);
+                return (tmp);
+            }
+
+            size_type count (const key_type& k) const
+            {
+                __base *tmp = tree.find(key_type(k), tree.right);
+                if (tmp == NULL)
+                    return (0);
+                return (1);
+            }
+
+            iterator lower_bound (const key_type& k)
+            {
+                if (tree.find(key_type(k), tree.right) != NULL)
+                    return (tree.find(key_type(k), tree.right));
+                __base *tmp = tree.getprevnode(key_type(k), tree.right);
+                if (tmp == NULL)
+                    return (&tree);
+                else
+                    return (tmp);
+            }
+
+            const_iterator lower_bound (const key_type& k) const
+            {
+                if (tree.find(key_type(k), tree.right) != NULL)
+                    return (tree.find(key_type(k), tree.right));
+                __base *tmp = tree.getprevnode(key_type(k), tree.right);
+                if (tmp == NULL)
+                    return (&tree);
+                else
+                    return (tmp);
+            }
+
+            iterator upper_bound(const key_type& k)
+            {
+                __base *tmp = tree.getnextnode(key_type(k), tree.right);
+                if (tmp == NULL)
+                    return (&tree);
+                else
+                    return (tmp);
+            }
+
+            const_iterator upper_bound (const key_type& k) const
+            {
+                __base *tmp = tree.getnextnode(key_type(k), tree.right);
+                if (tmp == NULL)
+                    return (&tree);
+                else
+                    return (tmp);
+            }
+
+            ft::pair<iterator,iterator>             equal_range (const key_type& k)
+            {
+                return(ft::make_pair(lower_bound(k), upper_bound(k)));
+            }
+
+            ft::pair<const_iterator,const_iterator> equal_range (const key_type& k) const
+            {
+                return(ft::make_pair(lower_bound(k), upper_bound(k)));
+            }
     };
 }
