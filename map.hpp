@@ -232,7 +232,8 @@ namespace ft{
                     }
                     temp = mink(root->right);
 
-                    root->m_pair = temp->m_pair;
+                    root->m_pair->first = temp->m_pair->first;
+                    root->m_pair->second = temp->m_pair->second;
 
                     root->right = deleteNode(root->right, temp->m_pair->first);
                 }
@@ -543,6 +544,35 @@ namespace ft{
                     first++;
                 }
             }
+
+            void erase (iterator position)
+            {
+                tree.deleteNode(tree.right,position->first);
+                n--;
+            }
+
+            size_type erase (const key_type& k)
+            {
+                if (!tree.find(k, tree.right))
+                    return 0;
+                tree.deleteNode(tree.right,k);
+                n--;
+                return 1;
+            }
+
+            void erase (iterator first, iterator last)
+            {
+                iterator tmp;
+                key_type k = first->first;;
+                while(first != last)
+                {
+                    first = tree.find(k, tree.right);
+                    tmp = first;
+                    first++;
+                    k = first->first;
+                    erase(tmp);
+                }
+            }
             
             void clear()
             {
@@ -590,6 +620,7 @@ namespace ft{
                     return (0);
                 return (1);
             }
+
 
             iterator lower_bound (const key_type& k)
             {
