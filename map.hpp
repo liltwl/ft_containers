@@ -26,8 +26,8 @@ namespace ft{
             typedef typename alloc_traits::const_pointer            const_pointer;
             typedef typename alloc_traits::size_type                size_type;
             typedef typename __alloc_traits::pointer                P;
-            typedef ft::mapiter<P, alloc_traits>			        iterator;
-            typedef ft::mapiter<P, alloc_traits>			        const_iterator;
+            typedef ft::mapiter<P, value_type>			        iterator;
+            typedef ft::mapiter<P, value_type>			        const_iterator;
 
         public:
             value_type *m_pair;
@@ -70,7 +70,7 @@ namespace ft{
                 allocc.deallocate(m_pair, 1);
             }
 
-            BST& operator= (BST& x)
+            BST& operator= (const BST& x)
             {  
                 BST* tmp;
                 clear(this);
@@ -207,9 +207,37 @@ namespace ft{
                 return current;
             }
 
+            void  swap(BST* root, BST* key)
+            {
+                BST* cc1 = root->right;
+                BST* cc2 = root->left;
+                BST* tmp = root->parent;
+                if (tmp != NULL)
+                {
+                    if (tmp->left == root)
+                        tmp->left = key;
+                    else
+                        tmp->right = key;
+                }
+                if (key->parent != NULL)
+                {
+                    if (key->parent->left == key)
+                        key->parent->left = root;
+                    else
+                        key->parent->right = root;
+                }
+                *root->m_pair = *key->m_pair;
+                root->parent =key->parent;
+                root->right = key->right;
+                root->left = key->left;
+                key->parent = tmp;
+                key->right = cc1;
+                key->left = cc2;
+            }
             BST*    deleteNode(BST* root, K key)
             {
                 BST     *temp;
+                value_type     *tmp;
                 if (root == NULL)
                     return root;
 
@@ -222,18 +250,17 @@ namespace ft{
                     if (root->left == NULL)
                     {
                         temp = root->right;
-                        delete root;
+                        //delete root;
                         return temp;
                     } else if (root->right == NULL) 
                     {
                         temp = root->left;
-                        delete (root);
+                        //delete (root);
                         return temp;
                     }
                     temp = mink(root->right);
-
-                    root->m_pair->first = temp->m_pair->first;
-                    root->m_pair->second = temp->m_pair->second;
+                    //*root->m_pair = *temp->m_pair;
+                    swap(root , temp);
 
                     root->right = deleteNode(root->right, temp->m_pair->first);
                 }
@@ -254,7 +281,7 @@ namespace ft{
                 root = root->right;
                 while (root != NULL) 
                 {
-                    if (!c(root->m_pair->first, key->m_pair->first))
+                    if (c(key->m_pair->first,  root->m_pair->first))
                     {
                         tmp = root;
                         root = root->left;
@@ -336,7 +363,7 @@ namespace ft{
                 return (tmp);
             }
 
-            BST *treecopy(BST *key)
+            BST *treecopy(const BST *key)
             {
                 if (key == NULL)
                     return (NULL);
@@ -465,8 +492,9 @@ namespace ft{
 			map& operator= (const map& x)
             {
                 clear();
-                insert (x.begin(), x.end());
-                n = tree.size(tree.right);
+                tree = x.tree;
+                //insert (x.begin(), x.end());
+                n =x.n;
                 return *this;
             }
 
@@ -493,10 +521,13 @@ namespace ft{
                     return &tree;
                 return tree.minkey(tree.right);
             }
-
-            iterator end()
+            reverse_iterator begin()
             {
-                return &tree;
+                return reverse_iterator(end());
+            }
+            reverse_iterator end()
+            {
+                return reverse_iterator(begin());
             }
             
 
@@ -507,6 +538,7 @@ namespace ft{
                 {
                     tree.right = tree.insert(tree.right, k, mapped_type());
                     tree.right->parent = &tree;
+                    n++;
                     tmp = tree.find(key_type(k), tree.right);
                 }
                 return (tmp->m_pair->second);
@@ -523,7 +555,7 @@ namespace ft{
                 tree.right  = tmp;
                 tree.right->parent = &tree;
                 n++;
-                iterator it = tree.find(val.first, &tree);
+                iterator it = tree.find(val.first, tree.right);
                 return (ft::make_pair<iterator,bool>(it, true));
             }
 
@@ -538,6 +570,7 @@ namespace ft{
             template <class InputIterator>
             void insert (InputIterator first, InputIterator last)
             {
+
                 while (first != last)
                 {
                     insert (*first);
@@ -547,7 +580,7 @@ namespace ft{
 
             void erase (iterator position)
             {
-                tree.deleteNode(tree.right,position->first);
+                tree.right = tree.deleteNode(tree.right, position->first);
                 n--;
             }
 
@@ -563,13 +596,12 @@ namespace ft{
             void erase (iterator first, iterator last)
             {
                 iterator tmp;
-                key_type k = first->first;;
                 while(first != last)
                 {
-                    first = tree.find(k, tree.right);
+                    //first = tree.find(k, tree.right);
                     tmp = first;
+                    //if (tree.find(tmp->first, tree.right))
                     first++;
-                    k = first->first;
                     erase(tmp);
                 }
             }

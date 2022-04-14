@@ -102,20 +102,25 @@ int main()
     mm.insert(p2);
     mm.insert(p3);
     mm.insert(*p);
+    mm.insert(ft::make_pair<string, string>("8", "ferf"));
     ft::BST<string , string> tmp;
     tmp = tmp1;
     mm["199"]  = "feff";
     cout << mm["6"] << " " << mm["7"] << endl; 
     tmp.deleteNode(&tmp, "4");
     //mm.clear();
-    cout << mm.lower_bound("199")->first << " -> " << mm.count("7") << endl;
+    cout << mm.equal_range("199").first->first << " -> " << mm.count("7") << endl;
     ft::map<string , string>::iterator it = mm.begin();
-
+    it++; 
+    it++;
+    mm.erase(mm.begin(), it);
+    cout << " ewff " << endl;
     it = mm.end();
+    cout << mm.size() << endl;
     while (it != mm.begin())
     {
         it--;
-        cout << (*it)->first << " -> " << it->second << endl;
+        cout << (*it).first << " -> " << it->second << endl;
     }
 
     // ft::vector<std::string> s(7, "wesh");

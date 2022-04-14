@@ -19,6 +19,7 @@ namespace ft
         pair& operator= (const pair& pr){
             first = pr.first;
             second = pr.second;
+            return *this;
         }
     };
     template <class T1, class T2>

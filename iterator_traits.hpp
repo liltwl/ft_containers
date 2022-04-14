@@ -19,7 +19,7 @@ struct iterator_traits
     typedef typename Iterator::pointer pointer;
     typedef typename Iterator::reference reference;
     //typedef typename Iterator::const_pointer   	const_pointer;
-    t//ypedef typename Iterator::iterator_category iterator_category;
+    //ypedef typename Iterator::iterator_category iterator_category;
 };
 
 template<class T>
@@ -53,8 +53,8 @@ class mapiter
     typedef typename iterator_traits<iterator_type>::iterator_category  iterator_category;
     typedef typename iterator_traits<iterator_type>::value_type         value_type;
     typedef typename iterator_traits<iterator_type>::difference_type    difference_type;
-    typedef typename K::pointer                                         pointer;
-    typedef typename iterator_traits<K>::reference          reference;
+    typedef K*                                                          pointer;
+    typedef K&                                                          reference;
 
 
     private:
@@ -75,7 +75,10 @@ class mapiter
              if (i == (i->maxkey(i)) || i == (i->end(i)).base())
                 *this = i->end(i);
             else
+            {
+	            cout << i->m_pair->first << endl; 
                 i = i->getnextnode(i);
+            }
             return *this;
         }
         mapiter  operator++(int){
@@ -84,7 +87,9 @@ class mapiter
             if (i == (i->maxkey(i)) || i == (i->end(i)).base())
                 *this = i->end(i);
             else
+            {
                 i = i->getnextnode(i);
+            }
             return (tmp);
         }
         mapiter& operator--(){
