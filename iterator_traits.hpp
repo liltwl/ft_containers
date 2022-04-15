@@ -18,8 +18,8 @@ struct iterator_traits
     typedef typename Iterator::value_type value_type;
     typedef typename Iterator::pointer pointer;
     typedef typename Iterator::reference reference;
-    //typedef typename Iterator::const_pointer   	const_pointer;
-    //ypedef typename Iterator::iterator_category iterator_category;
+    // typedef typename Iterator::const_pointer   	const_pointer;
+    // typedef typename Iterator::iterator_category iterator_category;
 };
 
 template<class T>
@@ -50,7 +50,6 @@ class mapiter
 {
     public:
     typedef ter                                                         iterator_type;
-    typedef typename iterator_traits<iterator_type>::iterator_category  iterator_category;
     typedef typename iterator_traits<iterator_type>::value_type         value_type;
     typedef typename iterator_traits<iterator_type>::difference_type    difference_type;
     typedef K*                                                          pointer;
@@ -76,7 +75,6 @@ class mapiter
                 *this = i->end(i);
             else
             {
-	            cout << i->m_pair->first << endl; 
                 i = i->getnextnode(i);
             }
             return *this;
@@ -117,6 +115,47 @@ class mapiter
         bool operator!= (const mapiter<Iterator, I>& lhs){return (i != (lhs.i));}
 
 };
+
+
+template<class Iter>
+class reverse_mapiter
+{
+    protected :
+        Iter prt;
+    
+    public :
+        typedef Iter                                            iterator_type;
+        typedef typename iterator_traits<Iter>::difference_type difference_type;
+        typedef typename Iter::reference       reference;
+        typedef typename Iter::pointer         pointer;
+
+        reverse_mapiter(): prt(NULL){}
+        explicit reverse_mapiter(iterator_type it): prt(it){}
+        template <class _Iter>
+        reverse_mapiter (const reverse_mapiter<_Iter>& rev_it): prt(rev_it.base()) {}
+
+        iterator_type base() const {return (prt);}
+        reference operator*() const{return(*(prt));}
+        reverse_mapiter& operator++(){prt--;return *this;}
+        reverse_mapiter  operator++(int){
+            reverse_mapiter tmp(*this);
+            prt--;
+            return (tmp);
+        }
+        reverse_mapiter& operator--(){prt++;return *this;}
+        reverse_mapiter  operator--(int){
+            reverse_mapiter tmp(*this);
+            prt++;
+            return (tmp);
+        }
+        pointer operator->() const{return &(*prt);}
+        template <class Iterator>
+        bool operator== (const reverse_mapiter<Iterator>& lhs){return (prt == lhs.prt);}
+        template <class Iterator>
+        bool operator!= (const reverse_mapiter<Iterator>& lhs){return (prt != lhs.prt);}
+};
+
+
 
 template <class ter>
 class myiter

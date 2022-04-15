@@ -2,7 +2,7 @@
 #include <memory>
 #include <stack>
 #include <vector>
-#include "vector.hpp"
+#include "Vector.hpp"
 #include "stack.hpp"
 #include <stack>
 #include <iterator>
@@ -98,6 +98,7 @@ int main()
     // tmp1.insert(&tmp1, p2);
     // tmp1.insert(&tmp1, p2);
     ft::map<string, string> mm;
+    ft::map<string, string> mm1;
     // cout << "wefwef"<<endl;
     mm.insert(p2);
     mm.insert(p3);
@@ -110,14 +111,15 @@ int main()
     tmp.deleteNode(&tmp, "4");
     //mm.clear();
     cout << mm.equal_range("199").first->first << " -> " << mm.count("7") << endl;
-    ft::map<string , string>::iterator it = mm.begin();
+    ft::map<string , string>::reverse_iterator it = mm.rbegin();
     it++; 
     it++;
-    mm.erase(mm.begin(), it);
-    cout << " ewff " << endl;
-    it = mm.end();
+    //mm.erase(mm.begin(), it);
+    if (mm < mm1)
+        cout << " ewff " << endl;
+    it = mm.rbegin();
     cout << mm.size() << endl;
-    while (it != mm.begin())
+    while (it != mm.rbegin())
     {
         it--;
         cout << (*it).first << " -> " << it->second << endl;

@@ -4,7 +4,7 @@
 #include <memory>
 #include <stack>
 #include <vector>
-#include "vector.hpp"
+//#include "Vector.hpp"
 #include "stack.hpp"
 #include "pair.hpp"
 #include <stack>
@@ -27,7 +27,7 @@ namespace ft{
             typedef typename alloc_traits::size_type                size_type;
             typedef typename __alloc_traits::pointer                P;
             typedef ft::mapiter<P, value_type>			        iterator;
-            typedef ft::mapiter<P, value_type>			        const_iterator;
+            typedef ft::mapiter<P, const value_type>			  const_iterator;
 
         public:
             value_type *m_pair;
@@ -441,8 +441,8 @@ namespace ft{
 
             typedef typename __base::iterator               	        iterator;
             typedef typename __base::const_iterator                   	    const_iterator;
-            typedef ft::reverse_iterator<iterator>       		        reverse_iterator;
-            typedef ft::reverse_iterator<const_iterator>   		        const_reverse_iterator;
+            typedef ft::reverse_mapiter<iterator>       		        reverse_iterator;
+            typedef ft::reverse_mapiter<const_iterator>   		        const_reverse_iterator;
 
             class value_compare
             { 
@@ -517,19 +517,50 @@ namespace ft{
 
             iterator begin()
             {
-                if (n==0)
+                cout << n << " map size" << endl;
+                if (n == 0)
                     return &tree;
                 return tree.minkey(tree.right);
             }
-            reverse_iterator begin()
+
+            iterator end()
+            {
+                return iterator(&tree);
+            }
+
+            const_iterator begin() const
+            {
+                cout << n << " map size" << endl;
+                if (n == 0)
+                    return const_iterator(&tree);
+                return (tree.minkey(tree.right));
+                // return const_iterator(begin());
+            }
+
+            const_iterator end() const
+            {
+                return const_iterator(end());
+            }
+
+            reverse_iterator rbegin()
             {
                 return reverse_iterator(end());
             }
-            reverse_iterator end()
+
+            reverse_iterator rend()
             {
                 return reverse_iterator(begin());
             }
             
+            const_reverse_iterator rbegin() const
+            {
+                return const_reverse_iterator(rbegin());
+            }
+
+            const_reverse_iterator rend() const
+            {
+                return const_reverse_iterator(rend());
+            }
 
             mapped_type& operator[] (const key_type& k)
             {
@@ -703,5 +734,60 @@ namespace ft{
             {
                 return(ft::make_pair(lower_bound(k), upper_bound(k)));
             }
+            
     };
+    template <class Key, class T, class Compare, class Alloc>
+    bool operator==(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+    {
+        if (lhs.size() != rhs.size())
+            return (false);
+        typename ft::map<Key, T, Compare, Alloc>::const_iterator it = rhs.begin();
+        typename ft::map<Key, T, Compare, Alloc>::const_iterator it2 = lhs.begin();
+        while (it != rhs.   end())
+        {
+            if (*it != *it2)
+                return (false);
+            ++it2;
+            ++it;
+        }
+        return (true);
+    }
+    template <class Key, class T, class Compare, class Alloc>
+    bool operator!=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+    {
+        return (!(lhs == rhs));
+    }
+    template <class Key, class T, class Compare, class Alloc>
+    bool operator>(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+    {
+        if (lhs.size() > rhs.size())
+            return (true);
+        cout << "FERFEF" << endl;
+        typename ft::map<Key, T, Compare, Alloc>::const_iterator it = lhs.begin();
+       typename ft::map<Key, T, Compare, Alloc>::const_iterator it2 = rhs.begin();
+        while (it != lhs.end() && it2 != rhs.end())
+        {
+            if (*it > *it2)
+                return (true);
+            ++it2;
+            ++it;
+        }
+        return (false);
+    }
+    template <class Key, class T, class Compare, class Alloc>
+    bool operator<(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+    {
+        return (!(lhs > rhs) && (lhs != rhs));
+    }
+    template <class Key, class T, class Compare, class Alloc>
+    bool operator>=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+    {
+        return (!(lhs < rhs));
+    }
+    template <class Key, class T, class Compare, class Alloc>
+    bool operator<=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+    {
+        return (!(lhs > rhs));
+    }
+
 }
