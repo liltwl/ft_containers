@@ -127,17 +127,17 @@ void t_map(void)
 	P("---------> Count <----");
 	P(verif( (s.count("one") == f.count("one") && s.count("lol") == f.count("lol"))  ));
 	
-	P("---------> Equal_Range <----");
-	{
-		std::pair<std::map<std::string, std::string>::iterator, std::map<std::string, std::string>::iterator> si;
-		ft::pair<ft::map<std::string, std::string>::iterator, ft::map<std::string, std::string>::iterator> fi; 
+	// P("---------> Equal_Range <----");
+	// {
+	// 	std::pair<std::map<std::string, std::string>::iterator, std::map<std::string, std::string>::iterator> si;
+	// 	ft::pair<ft::map<std::string, std::string>::iterator, ft::map<std::string, std::string>::iterator> fi; 
 
-		si = s.equal_range("three");
-		fi = f.equal_range("three");
+	// 	si = s.equal_range("three");
+	// 	fi = f.equal_range("three");
 
-		P(verif( (si.first->first == fi.first->first && si.first->second == fi.first->second 
-		&& si.second->first == fi.second->first && si.second->second == fi.second->second)  ));
-	}
+	// 	P(verif( (si.first->first == fi.first->first && si.first->second == fi.first->second 
+	// 	&& si.second->first == fi.second->first && si.second->second == fi.second->second)  ));
+	// }
 	P("---------> Lower_Bound <----");
 	{
 		std::map<std::string, std::string>::iterator si;

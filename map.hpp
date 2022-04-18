@@ -27,7 +27,7 @@ namespace ft{
             typedef typename alloc_traits::size_type                size_type;
             typedef typename __alloc_traits::pointer                P;
             typedef ft::mapiter<P, value_type>			        iterator;
-            typedef ft::mapiter<P, const value_type>			  const_iterator;
+            typedef ft::mapiter<P,  const value_type>			  const_iterator;
 
         public:
             value_type *m_pair;
@@ -73,11 +73,12 @@ namespace ft{
             BST& operator= (const BST& x)
             {  
                 BST* tmp;
-                clear(this);
+                //clear(this);
                 tmp = treecopy(&x);
                 m_pair = tmp->m_pair;
                 left = tmp->left;
                 right = tmp->right;
+                parent = tmp->parent;
                 return (*this);
             }
             BST *find(K key, BST* tmp)
@@ -180,6 +181,22 @@ namespace ft{
             }
 
             BST*    minkey(BST* root)
+            {
+                BST *current = root;
+                
+                if (!current) return  NULL;
+                while (current->parent != NULL)
+                {
+                    current = current->parent;
+                }
+                current = current->right;
+                while (current && current->left != NULL)
+                {
+                    current = current->left;
+                }
+                return current;
+            }
+            BST*    minkey(BST* root) const 
             {
                 BST *current = root;
                 
@@ -523,6 +540,14 @@ namespace ft{
                 return tree.minkey(tree.right);
             }
 
+            __base* _begin()
+            {
+                cout << n << " map size" << endl;
+                if (n == 0)
+                    return (const __base)&tree;
+                return *((tree.minkey(tree.right)));
+            }
+
             iterator end()
             {
                 return iterator(&tree);
@@ -531,15 +556,23 @@ namespace ft{
             const_iterator begin() const
             {
                 cout << n << " map size" << endl;
+                __base tmp(c, allocc);
                 if (n == 0)
-                    return const_iterator(&tree);
-                return (tree.minkey(tree.right));
-                // return const_iterator(begin());
+                {
+                    tmp.right = tree.right;
+                    cout << n << " map size" << endl;
+                    return const_iterator(&tmp);
+                }
+                tmp = *(tree.minkey(tree.right));
+                return const_iterator(&tmp);
+                //return const_iterator(_begin());
             }
 
             const_iterator end() const
             {
-                return const_iterator(end());
+                __base tmp;
+                tmp = tree;
+                return const_iterator(&tmp);
             }
 
             reverse_iterator rbegin()
@@ -659,7 +692,7 @@ namespace ft{
 
             value_compare value_comp() const
             {
-                return (this->value_compare);
+                return (value_compare(c));
             }
             iterator find (const key_type& k)
             {
@@ -727,12 +760,12 @@ namespace ft{
 
             ft::pair<iterator,iterator>             equal_range (const key_type& k)
             {
-                return(ft::make_pair(lower_bound(k), upper_bound(k)));
+                return(ft::pair<iterator,iterator>(lower_bound(k), upper_bound(k)));
             }
 
             ft::pair<const_iterator,const_iterator> equal_range (const key_type& k) const
             {
-                return(ft::make_pair(lower_bound(k), upper_bound(k)));
+                return(ft::pair<const_iterator,const_iterator>(lower_bound(k), upper_bound(k)));
             }
             
     };
@@ -762,11 +795,11 @@ namespace ft{
     {
         if (lhs.size() > rhs.size())
             return (true);
-        cout << "FERFEF" << endl;
         typename ft::map<Key, T, Compare, Alloc>::const_iterator it = lhs.begin();
        typename ft::map<Key, T, Compare, Alloc>::const_iterator it2 = rhs.begin();
         while (it != lhs.end() && it2 != rhs.end())
         {
+            cout << "FERFEF" << endl;
             if (*it > *it2)
                 return (true);
             ++it2;

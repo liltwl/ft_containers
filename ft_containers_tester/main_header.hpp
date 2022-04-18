@@ -2,8 +2,8 @@
 #	ifndef MAIN_HEAD_HPP
 #	define MAIN_HEAD_HPP
 
-// #include <map>
-// #include "map/map.hpp"
+#include <map>
+#include "../map.hpp"
 
 // #include <list>
 // #include "list/list.hpp"

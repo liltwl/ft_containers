@@ -50,8 +50,6 @@ class mapiter
 {
     public:
     typedef ter                                                         iterator_type;
-    typedef typename iterator_traits<iterator_type>::value_type         value_type;
-    typedef typename iterator_traits<iterator_type>::difference_type    difference_type;
     typedef K*                                                          pointer;
     typedef K&                                                          reference;
 
@@ -71,7 +69,7 @@ class mapiter
     
         mapiter& operator++()
         {
-             if (i == (i->maxkey(i)) || i == (i->end(i)).base())
+             if (i->m_pair == (i->maxkey(i))->m_pair || i->m_pair == (i->end(i)).base()->m_pair)
                 *this = i->end(i);
             else
             {
@@ -82,7 +80,7 @@ class mapiter
         mapiter  operator++(int){
             mapiter tmp(*this);
 
-            if (i == (i->maxkey(i)) || i == (i->end(i)).base())
+            if (i->m_pair == (i->maxkey(i))->m_pair || i->m_pair == (i->end(i)).base()->m_pair)
                 *this = i->end(i);
             else
             {
@@ -91,7 +89,7 @@ class mapiter
             return (tmp);
         }
         mapiter& operator--(){
-             if (i == (i->end(i)).base())
+             if (i->m_pair == (i->end(i)).base()->m_pair)
                 i = i->maxkey(i);
             else if (i->m_pair != (i->minkey(i))->m_pair)
                 i = i->getprevnode(i);
@@ -110,9 +108,9 @@ class mapiter
         }
         pointer operator->() const{return i->m_pair;}
         template <class Iterator, class I>
-        bool operator== (const mapiter<Iterator, I>& lhs){return (i == (lhs.i));}
+        bool operator== (const mapiter<Iterator, I>& lhs){return (i->m_pair == (lhs.i)->m_pair);}
         template <class Iterator, class I>
-        bool operator!= (const mapiter<Iterator, I>& lhs){return (i != (lhs.i));}
+        bool operator!= (const mapiter<Iterator, I>& lhs){return (i->m_pair != (lhs.i)->m_pair);}
 
 };
 
@@ -125,7 +123,6 @@ class reverse_mapiter
     
     public :
         typedef Iter                                            iterator_type;
-        typedef typename iterator_traits<Iter>::difference_type difference_type;
         typedef typename Iter::reference       reference;
         typedef typename Iter::pointer         pointer;
 
@@ -277,8 +274,6 @@ class reverse_iterator : public iterator<typename iterator_traits<Iter>::iterato
         iterator_type base() const {return (prt);}
         reference operator*() const{return(*(prt-1));}
         reverse_iterator operator+ (difference_type n) const{return reverse_iterator(prt - n);}
-        // template <class iter>
-        // difference_type operator+(const reverse_iterator<iter>& s2) {return prt - s2.base();}
         reverse_iterator& operator++(){prt--;return *this;}
         reverse_iterator  operator++(int){
             reverse_iterator tmp(*this);
@@ -290,8 +285,6 @@ class reverse_iterator : public iterator<typename iterator_traits<Iter>::iterato
             return *this;
         }
         reverse_iterator operator- (difference_type n) const{return reverse_iterator(prt + n);}
-        // template <class iter>
-        // difference_type operator-(const reverse_iterator<iter>& s2) {return prt + s2.base();}
         reverse_iterator& operator--(){prt++;return *this;}
         reverse_iterator  operator--(int){
             reverse_iterator tmp(*this);
