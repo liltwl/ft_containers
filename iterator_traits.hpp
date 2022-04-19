@@ -19,7 +19,7 @@ struct iterator_traits
     typedef typename Iterator::pointer pointer;
     typedef typename Iterator::reference reference;
     //typedef typename Iterator::const_pointer   	const_pointer;
-    typedef typename Iterator::iterator_category iterator_category;
+    //typedef typename Iterator::iterator_category iterator_category;
 };
 
 template<class T>

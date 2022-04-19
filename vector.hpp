@@ -355,7 +355,6 @@ public :
 		iterator tmp = first;
 		int i = last - first;
 	
-		std::cout << i<< std::endl;
 		for (int j= 0; j < i; j++)
 		{
 			tmp = erase(tmp);
