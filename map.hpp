@@ -73,7 +73,7 @@ namespace ft{
             BST& operator= (const BST& x)
             {  
                 BST* tmp;
-                //clear(this);
+                clear(this);
                 tmp = treecopy(&x);
                 m_pair = tmp->m_pair;
                 left = tmp->left;
@@ -226,30 +226,37 @@ namespace ft{
 
             void  swap(BST* root, BST* key)
             {
-                BST* cc1 = root->right;
-                BST* cc2 = root->left;
-                BST* tmp = root->parent;
-                if (tmp != NULL)
-                {
-                    if (tmp->left == root)
-                        tmp->left = key;
-                    else
-                        tmp->right = key;
-                }
-                if (key->parent != NULL)
-                {
-                    if (key->parent->left == key)
-                        key->parent->left = root;
-                    else
-                        key->parent->right = root;
-                }
+                // BST* cc1 = root->right;
+                // BST* cc2 = root->left;
+                // BST* tmp = root->parent;
+                // if (tmp != NULL)
+                // {
+                //     if (tmp->left == root)
+                //         tmp->left = key;
+                //     else
+                //         tmp->right = key;
+                // }
+                // if (key->parent != NULL)
+                // {
+                //     if (key->parent->left == key)
+                //         key->parent->left = root;
+                //     else
+                //         key->parent->right = root;
+                // }
+                // cout << root->m_pair->first << " " << root->m_pair->second << endl;
+                // allocc.construct(root->m_pair, *key->m_pair);
+                // cout << root->m_pair->first << " " << root->m_pair->second << endl;
+                // //root->m_pair = key->m_pair;
+                // root->parent =key->parent;
+                // root->right = key->right;
+                // root->left = key->left;
+                // key->parent = tmp;
+                // key->right = cc1;
+                // key->left = cc2;
+                value_type *tmp = root->m_pair;
                 root->m_pair = key->m_pair;
-                root->parent =key->parent;
-                root->right = key->right;
-                root->left = key->left;
-                key->parent = tmp;
-                key->right = cc1;
-                key->left = cc2;
+                key->m_pair = tmp;
+                allocc.construct(key->m_pair, *root->m_pair);
             }
             BST*    deleteNode(BST* root, K key)
             {
@@ -267,14 +274,17 @@ namespace ft{
                     if (root->left == NULL)
                     {
                         temp = root->right;
-                        //delete root;
+                        cout << root->m_pair->first << " " << root->m_pair->second << endl;
+                        // delete root;
                         return temp;
                     } else if (root->right == NULL) 
                     {
                         temp = root->left;
+                        cout << root->m_pair->first << " " << root->m_pair->second << endl;
                         //delete (root);
                         return temp;
                     }
+                    cout << "frf" << endl;
                     temp = mink(root->right);
                     //*root->m_pair = *temp->m_pair;
                     swap(root , temp);
@@ -551,21 +561,18 @@ namespace ft{
 
             const_iterator begin() const
             {
-                __base tmp(c, allocc);
                 if (n == 0)
                 {
-                    *tmp.m_pair = *tree.m_pair;
+                    __base tmp(*tree.m_pair, c, allocc);
                     return const_iterator(&tmp);
                 }
-                tmp = *(tree.minkey(tree.right));
+                __base tmp(*(tree.minkey(tree.right)->m_pair), c, allocc);
                 return const_iterator(&tmp);
-                //return const_iterator(_begin());
             }
 
             const_iterator end() const
             {
-                __base tmp(c, allocc);
-                *tmp.m_pair = *tree.m_pair;
+                __base tmp(*tree.m_pair,c, allocc);
                 return const_iterator(&tmp);
             }
 
@@ -660,9 +667,7 @@ namespace ft{
                 iterator tmp;
                 while(first != last)
                 {
-                    //first = tree.find(k, tree.right);
                     tmp = first;
-                    //if (tree.find(tmp->first, tree.right))
                     first++;
                     erase(tmp);
                 }
@@ -758,12 +763,12 @@ namespace ft{
 
             ft::pair<iterator,iterator>             equal_range (const key_type& k)
             {
-                return(ft::make_pair<iterator,iterator>(this->lower_bound(k), this->upper_bound(k)));
+                return(ft::pair<iterator,iterator>(lower_bound(k), upper_bound(k)));
             }
 
             ft::pair<const_iterator,const_iterator> equal_range (const key_type& k) const
             {
-                return(ft::make_pair<const_iterator,const_iterator>(this->lower_bound(k), this->upper_bound(k)));
+                return(ft::pair<const_iterator,const_iterator>(this->lower_bound(k), this->upper_bound(k)));
             }
             
             allocator_type get_allocator() const
@@ -806,7 +811,6 @@ namespace ft{
        typename ft::map<Key, T, Compare, Alloc>::const_iterator it2 = rhs.begin();
         while (it != lhs.end() && it2 != rhs.end())
         {
-            cout << "FERFEF" << endl;
             if (*it > *it2)
                 return (true);
             ++it2;

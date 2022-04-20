@@ -149,88 +149,88 @@ int main(void) {
 
 	}
 
-// 	std::cout << "----------------------- Modifiers " << std::endl;
-// 	{
-// 		TESTED_NAMESPACE::map<std::string, int> m1;
+	std::cout << "----------------------- Modifiers " << std::endl;
+	{
+		TESTED_NAMESPACE::map<std::string, int> m1;
 
-// 		std::cout << "> insert1 " << std::endl;
-// 		std::cout << "> [hoylee, 42] 추가 " << std::endl;
-// 		TESTED_NAMESPACE::pair<TESTED_NAMESPACE::map<std::string, int>::iterator, bool> m_pair;
-// 		std::cout << "=====================" << std::endl;
-// 		m_pair = m1.insert(TESTED_NAMESPACE::make_pair<std::string, int>("hoylee", 42));
+		std::cout << "> insert1 " << std::endl;
+		std::cout << "> [hoylee, 42] 추가 " << std::endl;
+		ft::pair<ft::map<std::string, int>::iterator, bool> m_pair;
+		std::cout << "=====================" << std::endl;
+		m_pair = m1.insert(TESTED_NAMESPACE::make_pair<std::string, int>("hoylee", 42));
 
-// 		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
-// 		print_map(m1);
-// 		std::cout << "insert return : " << m_pair.second << std::endl;
-// 		std::cout << std::endl;
+		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
+		print_map(m1);
+		std::cout << "insert return : " << m_pair.second << std::endl;
+		std::cout << std::endl;
 
-// 		std::cout << "> 같은 key 한번 더 insert" << std::endl;
-// 		m_pair = m1.insert(TESTED_NAMESPACE::make_pair<std::string, int>("hoylee", 42));
+		std::cout << "> 같은 key 한번 더 insert" << std::endl;
+		m_pair = m1.insert(TESTED_NAMESPACE::make_pair<std::string, int>("hoylee", 42));
 
-// 		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
-// 		print_map(m1);
-// 		std::cout << "insert return : " << m_pair.second << std::endl;
-// 		std::cout << std::endl;
+		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
+		print_map(m1);
+		std::cout << "insert return : " << m_pair.second << std::endl;
+		std::cout << std::endl;
 
-// 		std::cout << "> insert2 [yong: 100]" << std::endl;
-// 		m1.insert(m1.begin(), TESTED_NAMESPACE::pair<std::string, int>("yong", 100));
+		std::cout << "> insert2 [yong: 100]" << std::endl;
+		m1.insert(m1.begin(), TESTED_NAMESPACE::pair<std::string, int>("yong", 100));
 
-// 		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
-// 		print_map(m1);
-// 		std::cout << std::endl;
+		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
+		print_map(m1);
+		std::cout << std::endl;
 
-// 		std::cout << "> insert3 [one: 1, two: 2, three:3] " << std::endl;
-// 		TESTED_NAMESPACE::map<std::string, int> m2;
+		std::cout << "> insert3 [one: 1, two: 2, three:3] " << std::endl;
+		TESTED_NAMESPACE::map<std::string, int> m2;
 
-// 		m2["one"] = 1;
-// 		m2["two"] = 2;
-// 		m2["three"] = 3;
+		m2["one"] = 1;
+		m2["two"] = 2;
+		m2["three"] = 3;
 		
-// 		m1.insert(m2.begin(), m2.end());
-// 		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
-// 		print_map(m1);
-// 		std::cout << std::endl;
+		m1.insert(m2.begin(), m2.end());
+		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
+		print_map(m1);
+		std::cout << std::endl;
 
-// 		std::cout << "> erase1 - begin()" << std::endl;
-// 		m1.erase(m1.begin());
-// 		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
-// 		print_map(m1);
-// 		std::cout << std::endl;
+		std::cout << "> erase1 - begin()" << std::endl;
+		m1.erase(m1.begin());
+		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
+		print_map(m1);
+		std::cout << std::endl;
 
-// //		std::cout << "> erase2 key - yong" << std::endl;
-// //		std1.erase("yong");
-// //		m1.erase("yong");
-// ////		//설명 : 이거 ambigous 에러나는데, 못잡겠음 .ㅠ.ㅠ.ㅠ.ㅠ.ㅠ.ㅠ.ㅠ :
-// 		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
-// 		print_map(m1);
-// 		std::cout << std::endl;
-// 		std::cout << "> erase3 begin(), ++begin()" <<  std::endl;
+		std::cout << "> erase2 key - yong" << std::endl;
+		// std1.erase("yong");
+		// m1.erase("yong");
+//		//설명 : 이거 ambigous 에러나는데, 못잡겠음 .ㅠ.ㅠ.ㅠ.ㅠ.ㅠ.ㅠ.ㅠ :
+		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
+		print_map(m1);
+		std::cout << std::endl;
+		std::cout << "> erase3 begin(), ++begin()" <<  std::endl;
 
-// 		m1.erase(m1.begin(), (++m1.begin()));
-// 		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
-// 		print_map(m1);
-// 		std::cout << std::endl;
+		m1.erase(m1.begin(), (++m1.begin()));
+		std::cout << "🚛 m  ( size : " << m1.size() << " )" << std::endl;
+		print_map(m1);
+		std::cout << std::endl;
 
-// 		std::cout << "> swap " << std::endl;
-// 		std::cout << "🚛 m1  ( size : " << m1.size() << " )" << std::endl;
-// 		print_map(m1);
-// 		std::cout << "🚛 m2  ( size : " << m2.size() << " )" << std::endl;
-// 		print_map(m2);
-// 		std::cout << std::endl;
-// 		std::cout << "> 1.swap(2)" << std::endl;
-// 		m1.swap(m2);
-// 		std::cout << "🚛 m1  ( size : " << m1.size() << " )" << std::endl;
-// 		print_map(m1);
-// 		std::cout << "🚛 m2  ( size : " << m2.size() << " )" << std::endl;
-// 		print_map(m2);
-// 		std::cout << std::endl;
+		std::cout << "> swap " << std::endl;
+		std::cout << "🚛 m1  ( size : " << m1.size() << " )" << std::endl;
+		print_map(m1);
+		std::cout << "🚛 m2  ( size : " << m2.size() << " )" << std::endl;
+		print_map(m2);
+		std::cout << std::endl;
+		std::cout << "> 1.swap(2)" << std::endl;
+		m1.swap(m2);
+		std::cout << "🚛 m1  ( size : " << m1.size() << " )" << std::endl;
+		print_map(m1);
+		std::cout << "🚛 m2  ( size : " << m2.size() << " )" << std::endl;
+		print_map(m2);
+		std::cout << std::endl;
 
-// 		std::cout << "> clear 1" << std::endl;
-// 		m1.clear();
-// 		std::cout << "🚛 m1  ( size : " << m1.size() << " )" << std::endl;
-// 		print_map(m1);
-// 		std::cout << std::endl;
-// 	}
+		std::cout << "> clear 1" << std::endl;
+		m1.clear();
+		std::cout << "🚛 m1  ( size : " << m1.size() << " )" << std::endl;
+		print_map(m1);
+		std::cout << std::endl;
+	}
 
 	std::cout << "----------------------- Observers " << std::endl;
 	{
@@ -308,10 +308,10 @@ int main(void) {
 		std::cout << "🚛 m1.upper_bound(3)  => " << m1.upper_bound(3)->first << " : " << m1.upper_bound(3)->second << std::endl;
 		std::cout << std::endl;
 		std::cout << "> equal_range " << std::endl;
-		//TESTED_NAMESPACE::pair<TESTED_NAMESPACE::map<int, std::string>::iterator, TESTED_NAMESPACE::map<int, std::string>::iterator> m_it_pair;
-		// //m_it_pair = m1.equal_range(1);
-		// std::cout << "🚛 m  : " << m_it_pair.first->first << " => " << m_it_pair.first->second << std::endl;
-		// std::cout << "🚛 m  : " << m_it_pair.second->first << " => " << m_it_pair.second->second << std::endl;
+		TESTED_NAMESPACE::pair<TESTED_NAMESPACE::map<int, std::string>::iterator, TESTED_NAMESPACE::map<int, std::string>::iterator> m_it_pair;
+		m_it_pair = m1.equal_range(1);
+		std::cout << "🚛 m  : " << m_it_pair.first->first << " => " << m_it_pair.first->second << std::endl;
+		std::cout << "🚛 m  : " << m_it_pair.second->first << " => " << m_it_pair.second->second << std::endl;
 		std::cout << std::endl;
 	}
 

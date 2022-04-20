@@ -2,7 +2,7 @@
 #include <memory>
 #include <stack>
 #include <vector>
-#include "Vector.hpp"
+//#include "Vector.hpp"
 #include "stack.hpp"
 #include <stack>
 #include <iterator>
@@ -93,7 +93,7 @@ int main()
     //     cout << it->first << " " << it->second << endl;
     //     it++;
     // }
-    ft::BST<string , string> tmp1(p3);
+    // ft::BST<string , string> tmp1(p3);
     //tmp1.insert(&tmp1, "4", "cdcdc");
     // tmp1.insert(&tmp1, p2);
     // tmp1.insert(&tmp1, p2);
@@ -104,20 +104,22 @@ int main()
     mm.insert(p3);
     mm.insert(*p);
     mm.insert(ft::make_pair<string, string>("8", "ferf"));
-    ft::BST<string , string> tmp;
-    tmp = tmp1;
+    // ft::BST<string , string> tmp;
+    // tmp = tmp1;
     mm["199"]  = "feff";
     cout << mm["6"] << " " << mm["7"] << endl; 
-    tmp.deleteNode(&tmp, "4");
+    // tmp.deleteNode(&tmp, "4");
     //mm.clear();
     cout << mm.equal_range("199").first->first << " -> " << mm.count("7") << endl;
     ft::map<string , string>::reverse_iterator it = mm.rbegin();
+    ft::pair<ft::map<std::string, string>::iterator, bool> m_pair(mm.insert(p2));
+    m_pair =  mm.insert(p2);
     it++; 
     it++;
     //mm.erase(mm.begin(), it);
     if (mm < mm1)
         cout << " ewff " << endl;
-    it = mm.rbegin();
+    it = mm.rend();
     cout << mm.size() << endl;
     while (it != mm.rbegin())
     {
