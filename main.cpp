@@ -9,7 +9,7 @@
 #include <string>
 #include <map>
 #include "pair.hpp"
-#include "map.hpp"
+#include "Map copy.hpp"
 int main()
 {
   
@@ -101,30 +101,36 @@ int main()
     ft::map<string, string> mm1;
     // cout << "wefwef"<<endl;
     mm.insert(p2);
+    cout << "          **************"<<endl;
     mm.insert(p3);
+    cout << "          **************"<<endl;
     mm.insert(*p);
+    cout << "          **************"<<endl;
     mm.insert(ft::make_pair<string, string>("8", "ferf"));
     // ft::BST<string , string> tmp;
     // tmp = tmp1;
+    cout << "          **************"<<endl;
     mm["199"]  = "feff";
+    cout << "          **************"<<endl;
     cout << mm["6"] << " " << mm["7"] << endl; 
     // tmp.deleteNode(&tmp, "4");
     //mm.clear();
     cout << mm.equal_range("199").first->first << " -> " << mm.count("7") << endl;
-    ft::map<string , string>::reverse_iterator it = mm.rbegin();
+    ft::map<string , string>::iterator it = mm.begin();
     ft::pair<ft::map<std::string, string>::iterator, bool> m_pair(mm.insert(p2));
-    m_pair =  mm.insert(p2);
+    //m_pair =  mm.insert(p2);
     it++; 
     it++;
+    it++;
+    it++;
     //mm.erase(mm.begin(), it);
-    if (mm < mm1)
-        cout << " ewff " << endl;
-    it = mm.rend();
+    cout << it->first << endl;
+    it = mm.begin();
     cout << mm.size() << endl;
-    while (it != mm.rbegin())
+    while (it != mm.end())
     {
-        it--;
         cout << (*it).first << " -> " << it->second << endl;
+        it++;
     }
 
     // ft::vector<std::string> s(7, "wesh");

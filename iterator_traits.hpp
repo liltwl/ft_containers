@@ -19,7 +19,7 @@ struct iterator_traits
     typedef typename Iterator::pointer pointer;
     typedef typename Iterator::reference reference;
     //typedef typename Iterator::const_pointer   	const_pointer;
-    //typedef typename Iterator::iterator_category iterator_category;
+    typedef typename Iterator::iterator_category iterator_category;
 };
 
 template<class T>
@@ -28,7 +28,6 @@ struct iterator_traits<T*>
     typedef ptrdiff_t difference_type;
     typedef T value_type;
     typedef T* pointer;
-    typedef typename T::pointer point;
     typedef T& reference;
     typedef random_access_iterator_tag iterator_category;
 };
@@ -274,7 +273,7 @@ class reverse_iterator : public iterator<typename iterator_traits<Iter>::iterato
         reverse_iterator (const reverse_iterator<_Iter>& rev_it): prt(rev_it.base()) {}
 
         iterator_type base() const {return (prt);}
-        reference operator*() const{return(*(prt));}
+        reference operator*() const{return(*(prt - 1));}
         reverse_iterator operator+ (difference_type n) const{return reverse_iterator(prt - n);}
         reverse_iterator& operator++(){prt--;return *this;}
         reverse_iterator  operator++(int){
@@ -297,7 +296,7 @@ class reverse_iterator : public iterator<typename iterator_traits<Iter>::iterato
             prt += n;
             return *this;
         }
-        pointer operator->() const{return &(*(prt));}
+        pointer operator->() const{return &(*(prt - 1));}
         reference operator[] (difference_type n) const{return *(prt - 1 + n);}
         template <class Iterator>
         bool operator< (const reverse_iterator<Iterator>& lhs){return (prt > lhs.prt);}

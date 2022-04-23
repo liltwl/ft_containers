@@ -129,28 +129,6 @@ namespace ft{
 
             BST* leftRotate(BST* x) 
             {
-                
-                BST* y = x->left;
-                x->left = y->right;
-                if (y->right != nullptr) {
-                    y->right->parent = x;
-                }
-                x->parent = y->parent;
-                // if (x->parent == nullptr) {
-                //     ;
-                // } else if (x == x->parent->right) {
-                //     x->parent->right = y;
-                // } else {
-                //     x->parent->left = y;
-                // }
-                y->right = x;
-                x->parent = y;
-                return (y);
-            }
-
-
-            BST* rightRotate(BST* x)
-            {
                 BST *y = x->right;
                 x->right = y->left;
                 if (y->left != nullptr)
@@ -158,19 +136,40 @@ namespace ft{
                     y->left->parent = x;
                 }
                 y->parent = x->parent;
-                // if (x->parent == nullptr)
-                // {
-                //     ;
-                // } else if (x == x->parent->left)
-                // {
-                //     x->parent->left = y;
-                // } else {
-                //     x->parent->right = y;
-                // }
+                if (x->parent == nullptr)
+                {
+                    ;
+                } else if (x == x->parent->left)
+                {
+                    x->parent->left = y;
+                } else {
+                    x->parent->right = y;
+                }
                 y->left = x;
                 x->parent = y;
 
                 // update the balance factor
+                return (y);
+            }
+
+
+            BST* rightRotate(BST* x)
+            {
+                BST* y = x->left;
+                x->left = y->right;
+                if (y->right != nullptr) {
+                    y->right->parent = x;
+                }
+                x->parent = y->parent;
+                if (x->parent == nullptr) {
+                    ;
+                } else if (x == x->parent->right) {
+                    x->parent->right = y;
+                } else {
+                    x->parent->left = y;
+                }
+                y->right = x;
+                x->parent = y;
                 return (y);
             }
 
@@ -181,8 +180,8 @@ namespace ft{
                 int h = 0;
                 if (t != NULL)
                 {
-                    int l_height = height(t->left);
-                    int r_height = height(t->right);
+                    int l_height = height(t->l);
+                    int r_height = height(t->r);
                     int max_height = std::max(l_height, r_height);
                     h = max_height + 1;
                 }
@@ -192,8 +191,8 @@ namespace ft{
             {
                 if (t != NULL)
                 {
-                    int l_height = height(t->left);
-                    int r_height = height(t->right);
+                    int l_height = height(t->l);
+                    int r_height = height(t->r);
                     int b_factor = l_height - r_height;
                     return b_factor;
                 }
@@ -202,50 +201,21 @@ namespace ft{
 
             BST* rebalance(BST* node) 
             {
-                BST*    tmp;
-                int bal_factor = difference(node);
-
+                int bal_factor = difference(t);
                 if (bal_factor > 1) {
-                    if (difference(node->right) > 0)
+                    if (difference(node->right) <= 0) {
+                        node->right = rightRotate(node->right);
+                        node = leftRotate(node);
+                    } else 
                     {
-                        // tmp = node->right
                         node = leftRotate(node);
                     }
-                    else 
-                    {
-                        node->left = rightRotate(node->left);
-                        node = leftRotate(node);
-                    }
-                } else if (bal_factor < -1) {
-                    if (difference(node->left) > 0)
-                    {
-                        node->right = leftRotate(node->right);
+                } else if (node->bf < 0) {
+                    if (node->left->bf > 0) {
+                        node->left = leftRotate(node->left);
                         node = rightRotate(node);
-                    }
-                    else
-                    {
+                    } else {
                         node = rightRotate(node);
-                    }
-                }
-                return node;
-            }
-
-            BST* updateBalance(BST* node)
-            {
-                if (difference(node) < -1 || difference(node) > 1) {
-                    node = rebalance(node);
-                
-                    return node;
-                }
-
-                if (node->left != nullptr) {
-                    if (difference(node->left) != 0) {
-                        node->left = updateBalance(node->left);
-                    }
-                }
-                if (node->right != nullptr) {
-                    if (difference(node->right) != 0) {
-                        node->left = updateBalance(node->right);
                     }
                 }
                 return node;
@@ -260,12 +230,10 @@ namespace ft{
                 }
                 if (c(root->m_pair->first, pair.first)){
                     root->right = insert(root->right, pair);
-                    root->right = rebalance(root->right);
                     root->right->parent = root;
                 }
                 else {
                     root->left = insert(root->left, pair);
-                    root->left = rebalance(root->left);
                     root->left->parent = root;
                 }
                 return root;
@@ -280,24 +248,14 @@ namespace ft{
                 }
                 if (root->m_pair->first < first){
                     root->right = insert(root->right, first, second);
-                    root->right = rebalance(root->right);
                     root->right->parent = root;
                 }
                 else {
                     root->left = insert(root->left, first, second);
-                    root->left = rebalance(root->left);
                     root->left->parent = root;
                 }
             
                 return root;
-            }
-            void inorder(BST *t)//inorder traversal
-            {
-                if (t == NULL)
-                return;
-                inorder(t->left);
-                inorder(t->right);
-                cout << "*****>"<< t->m_pair->first << endl;
             }
 
             BST*    maxkey(BST* root)
@@ -491,7 +449,7 @@ namespace ft{
                 {
                     root = root->parent;
                 }
-               root = root->right;
+                root = root->right;
                 while (root != NULL) 
                 {
                     if (root->m_pair->first < key->m_pair->first)
@@ -586,17 +544,17 @@ namespace ft{
 
 
     template <class K, class T,class Compare = less<K>, class Alloc = allocator<ft::pair<const K,T> > >
-    class map{
+    class Map{
         public :
             typedef K                                                   key_type;
-            typedef T                                                   mapped_type;
-            typedef ft::pair<const key_type, mapped_type>                   value_type;
+            typedef T                                                   Mapped_type;
+            typedef ft::pair<const key_type, Mapped_type>                   value_type;
             typedef Compare                                             key_compare;
             typedef Alloc                                               allocator_type;
             typedef value_type&                                         reference;
             typedef const value_type&                                   const_reference;
 
-            typedef BST<key_type, mapped_type, Compare, allocator_type>   __base;
+            typedef BST<key_type, Mapped_type, Compare, allocator_type>   __base;
 
             typedef allocator_traits<allocator_type>         	         alloc_traits;
             typedef typename alloc_traits::pointer                      pointer;
@@ -611,7 +569,7 @@ namespace ft{
 
             class value_compare
             { 
-				friend class map;
+				friend class Map;
                 protected:
                 Compare comp;
                 value_compare (Compare c) : comp(c) {}
@@ -632,13 +590,13 @@ namespace ft{
             Compare     c;
         public :
 
-            map (const key_compare& comp = key_compare(),
+            Map (const key_compare& comp = key_compare(),
               const allocator_type& alloc = allocator_type()) : n(0), tree(comp, alloc), allocc(alloc),c(comp) {
                    
               }
 
             template <class InputIterator>
-            map (InputIterator first, InputIterator last,
+            Map (InputIterator first, InputIterator last,
                 const key_compare& comp = key_compare(),
                 const allocator_type& alloc = allocator_type()): n(0), tree(comp, alloc), allocc(alloc), c(comp)
             {
@@ -646,14 +604,14 @@ namespace ft{
 				n = tree.size(tree.right);
             }
 
-            map (const map& x) : tree(x.c, x.allocc)
+            Map (const Map& x) : tree(x.c, x.allocc)
             {
                 *this = x;
             }
 
-			~map(){}
+			~Map(){}
 
-			map& operator= (const map& x)
+			Map& operator= (const Map& x)
             {
                 clear();
                 tree = x.tree;
@@ -738,15 +696,13 @@ namespace ft{
                 return const_reverse_iterator(begin());
             }
 
-            mapped_type& operator[] (const key_type& k)
+            Mapped_type& operator[] (const key_type& k)
             {
                 __base *tmp = tree.find(key_type(k), tree.right);
                 if (tmp == NULL)
                 {
-                    tree.right = tree.insert(tree.right, k, mapped_type());
+                    tree.right = tree.insert(tree.right, k, Mapped_type());
                     tree.right->parent = &tree;
-                    //tree.inorder(tree.right);
-
                     n++;
                     tmp = tree.find(key_type(k), tree.right);
                 }
@@ -761,9 +717,7 @@ namespace ft{
                 {
                     return (ft::pair<iterator,bool>(end(), false));
                 }
-                //tmp = tmp->updateBalance(tmp);
-                tree.right = tmp;
-                //tree.inorder(tree.right);
+                tree.right  = tmp;
                 tree.right->parent = &tree;
                 n++;
                 iterator it(tree.find(val.first, tree.right));
@@ -772,10 +726,8 @@ namespace ft{
 
             iterator insert (iterator position, const value_type& val)
             {
-                __base *tmp =tree.insert(tree.find(position->first,tree.right), value_type(val));
+                tree.right =tree.insert(tree.find(position->first,tree.right), value_type(val));
                 tree.right->parent = &tree;
-                //tmp = tmp->updateBalance(tmp);
-                tree.right = tmp;
                 n++;
                 return (tree.find(val.first,tree.right));
             }
@@ -823,9 +775,9 @@ namespace ft{
                 n = 0;
             }
 
-            void swap (map& x)
+            void swap (Map& x)
             {
-                map tmp;
+                Map tmp;
 
                 tmp = x;
                 x = *this;
@@ -921,12 +873,12 @@ namespace ft{
             }
     };
     template <class Key, class T, class Compare, class Alloc>
-    bool operator==(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+    bool operator==(const Map<Key, T, Compare, Alloc> &lhs, const Map<Key, T, Compare, Alloc> &rhs)
     {
         if (lhs.size() != rhs.size())
             return (false);
-        typename ft::map<Key, T, Compare, Alloc>::const_iterator it = rhs.begin();
-        typename ft::map<Key, T, Compare, Alloc>::const_iterator it2 = lhs.begin();
+        typename ft::Map<Key, T, Compare, Alloc>::const_iterator it = rhs.begin();
+        typename ft::Map<Key, T, Compare, Alloc>::const_iterator it2 = lhs.begin();
         while (it != rhs.   end())
         {
             if (*it != *it2)
@@ -937,22 +889,22 @@ namespace ft{
         return (true);
     }
     template <class Key, class T, class Compare, class Alloc>
-	void swap(ft::map<Key, T, Compare, Alloc> &x, ft::map<Key, T, Compare, Alloc> &y)
+	void swap(ft::Map<Key, T, Compare, Alloc> &x, ft::Map<Key, T, Compare, Alloc> &y)
 	{
 		x.swap(y);
 	};
     template <class Key, class T, class Compare, class Alloc>
-    bool operator!=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+    bool operator!=(const Map<Key, T, Compare, Alloc> &lhs, const Map<Key, T, Compare, Alloc> &rhs)
     {
         return (!(lhs == rhs));
     }
     template <class Key, class T, class Compare, class Alloc>
-    bool operator>(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+    bool operator>(const Map<Key, T, Compare, Alloc> &lhs, const Map<Key, T, Compare, Alloc> &rhs)
     {
         if (lhs.size() > rhs.size())
             return (true);
-        typename ft::map<Key, T, Compare, Alloc>::const_iterator it = lhs.begin();
-       typename ft::map<Key, T, Compare, Alloc>::const_iterator it2 = rhs.begin();
+        typename ft::Map<Key, T, Compare, Alloc>::const_iterator it = lhs.begin();
+       typename ft::Map<Key, T, Compare, Alloc>::const_iterator it2 = rhs.begin();
         while (it != lhs.end() && it2 != rhs.end())
         {
             if (*it > *it2)
@@ -963,17 +915,17 @@ namespace ft{
         return (false);
     }
     template <class Key, class T, class Compare, class Alloc>
-    bool operator<(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+    bool operator<(const Map<Key, T, Compare, Alloc> &lhs, const Map<Key, T, Compare, Alloc> &rhs)
     {
         return (!(lhs > rhs) && (lhs != rhs));
     }
     template <class Key, class T, class Compare, class Alloc>
-    bool operator>=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+    bool operator>=(const Map<Key, T, Compare, Alloc> &lhs, const Map<Key, T, Compare, Alloc> &rhs)
     {
         return (!(lhs < rhs));
     }
     template <class Key, class T, class Compare, class Alloc>
-    bool operator<=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)
+    bool operator<=(const Map<Key, T, Compare, Alloc> &lhs, const Map<Key, T, Compare, Alloc> &rhs)
     {
         return (!(lhs > rhs));
     }
