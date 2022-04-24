@@ -9,10 +9,20 @@
 #include <string>
 #include <map>
 #include "pair.hpp"
-#include "Map copy.hpp"
+#include "map.hpp"
+
+
+template <class T>
+typename ft::enable_if<ft::is_integral<T>::value,bool>::type
+  is_odd (T i) {return bool(i%2);}
+
+// 2. the second template argument is only valid if T is an integral type:
+template < class T, class = typename ft::enable_if<ft::is_integral<T>::value >::type >
+bool is_even (T i) {return !bool(i%2);}
+
 int main()
 {
-  
+   int i = 1;
     // allocator for integer values
     // std::allocator<int> myAllocator;
     // // allocate space for five ints
@@ -117,6 +127,9 @@ int main()
     //mm.clear();
     cout << mm.equal_range("199").first->first << " -> " << mm.count("7") << endl;
     ft::map<string , string>::iterator it = mm.begin();
+    ft::map<string , string>::const_iterator cit = mm.begin();
+    if (it == cit)
+    cout << mm.size() << "size hobalobadobdob" << endl;
     ft::pair<ft::map<std::string, string>::iterator, bool> m_pair(mm.insert(p2));
     //m_pair =  mm.insert(p2);
     it++; 
@@ -126,12 +139,20 @@ int main()
     //mm.erase(mm.begin(), it);
     cout << it->first << endl;
     it = mm.begin();
-    cout << mm.size() << endl;
     while (it != mm.end())
     {
         cout << (*it).first << " -> " << it->second << endl;
         it++;
     }
+
+    std::cout << std::boolalpha;
+    std::cout << "i is odd: " << is_odd(i) << std::endl;
+    std::cout << "i is even: " << is_even(i) << std::endl;
+
+    std::cout << "is_integral<int> == " << std::boolalpha
+        << ft::is_integral<int>::value << std::endl;
+    std::cout << "is_integral<float> == " << std::boolalpha
+        << ft::is_integral<float>::value << std::endl;
 
     // ft::vector<std::string> s(7, "wesh");
     // ft::vector<std::string> f(5, "asat");

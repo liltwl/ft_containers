@@ -60,9 +60,10 @@ namespace ft{
             {
                 BST* tmp;
                 tmp = treecopy(&other);
-                m_pair = tmp->m_pair;
+                allocc.construct(m_pair,*tmp->m_pair);
                 left = tmp->left;
                 right = tmp->right;
+                delete tmp;
             }
             
             ~BST()
@@ -73,13 +74,15 @@ namespace ft{
             BST& operator= (const BST& x)
             {  
                 BST* tmp;
-                clear(this);
-                tmp = treecopy(&x);
-                m_pair = tmp->m_pair;
-                left = tmp->left;
-                right = tmp->right;
-                parent = tmp->parent;
-                return (*this);
+                clear(right);
+                clear(left);
+                //right = treecopy(x.right);
+                // allocc.construct(m_pair,*tmp->m_pair);
+                // left = tmp->left;
+                // right = tmp->right;
+                // parent = tmp->parent;
+                delete this;
+                return (*tmp);
             }
             BST *find(K key, BST* tmp)
             {
@@ -297,7 +300,6 @@ namespace ft{
                 return;
                 inorder(t->left);
                 inorder(t->right);
-                cout << "*****>"<< t->m_pair->first << endl;
             }
 
             BST*    maxkey(BST* root)
@@ -404,27 +406,31 @@ namespace ft{
                     return root;
 
                 if (key < root->m_pair->first)
+                {
                     root->left = deleteNode(root->left, key);
+                    if (root->left != NULL)
+                        root->left->parent = root;
+                }
                 else if (key > root->m_pair->first)
+                {
                     root->right = deleteNode(root->right, key);
+                    if (root->right != NULL)
+                        root->right->parent = root;
+                }
                 else 
                 {
                     if (root->left == NULL)
                     {
                         temp = root->right;
-                        cout << root->m_pair->first << " " << root->m_pair->second << endl;
-                        // delete root;
+                        delete root;
                         return temp;
                     } else if (root->right == NULL) 
                     {
                         temp = root->left;
-                        cout << root->m_pair->first << " " << root->m_pair->second << endl;
-                        //delete (root);
+                        delete (root);
                         return temp;
                     }
-                    cout << "frf" << endl;
                     temp = mink(root->right);
-                    //*root->m_pair = *temp->m_pair;
                     swap(root , temp);
 
                     root->right = deleteNode(root->right, temp->m_pair->first);
@@ -561,13 +567,13 @@ namespace ft{
 
             void clear(BST * root)
             {
-                if (root == NULL || root->parent == NULL)
+                if (root == NULL)
                     return ;
                 if (root->left != NULL)
                     clear(root->left);
                 if (root->right != NULL)
                     clear(root->right);
-                delete root;
+                    delete root;
             }
             iterator begin(BST* root)
             {
@@ -630,6 +636,19 @@ namespace ft{
 
             allocator_type allocc;
             Compare     c;
+
+            void __clear(__base* root)
+            {
+                if (root == NULL)
+                    return ;
+                if (root->left != NULL)
+                    __clear(root->left);
+                if (root->right != NULL)
+                    __clear(root->right);
+                
+                delete root;
+            }
+
         public :
 
             map (const key_compare& comp = key_compare(),
@@ -651,12 +670,18 @@ namespace ft{
                 *this = x;
             }
 
-			~map(){}
+			~map()
+            {
+                if (n != 0)
+                    __clear(tree.right);
+            }
 
 			map& operator= (const map& x)
             {
-                clear();
-                tree = x.tree;
+                tree.clear(tree.right);
+                tree.right = tree.treecopy(x.tree.right);
+                if (tree.right != NULL)
+                    tree.right->parent = &tree;
                 n = x.n;
                 return *this;
             }
@@ -745,7 +770,6 @@ namespace ft{
                 {
                     tree.right = tree.insert(tree.right, k, mapped_type());
                     tree.right->parent = &tree;
-                    //tree.inorder(tree.right);
 
                     n++;
                     tmp = tree.find(key_type(k), tree.right);
@@ -761,9 +785,7 @@ namespace ft{
                 {
                     return (ft::pair<iterator,bool>(end(), false));
                 }
-                //tmp = tmp->updateBalance(tmp);
                 tree.right = tmp;
-                //tree.inorder(tree.right);
                 tree.right->parent = &tree;
                 n++;
                 iterator it(tree.find(val.first, tree.right));
@@ -794,6 +816,8 @@ namespace ft{
             void erase (iterator position)
             {
                 tree.right = tree.deleteNode(tree.right, position->first);
+                if (tree.right != NULL)
+                    tree.right->parent = &tree;
                 n--;
             }
 
@@ -801,7 +825,9 @@ namespace ft{
             {
                 if (!tree.find(k, tree.right))
                     return 0;
-                tree.deleteNode(tree.right,k);
+                tree.right =tree.deleteNode(tree.right,k);
+                if (tree.right != NULL)
+                    tree.right->parent = &tree;
                 n--;
                 return 1;
             }
@@ -819,7 +845,8 @@ namespace ft{
             
             void clear()
             {
-                tree.clear(tree.right);
+                if (n != 0)
+                    __clear(tree.right);
                 n = 0;
             }
 

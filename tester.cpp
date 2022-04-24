@@ -20,7 +20,7 @@ void print_map(TESTED_NAMESPACE::map<T1, T2> map) {
 }
 
 
-int main(void) {
+void ft__(void) {
 	std::cout << "=====================================" << std::endl;
 	std::cout << "===============[ MAP ]===============" << std::endl;
 	std::cout << "=====================================" << std::endl;
@@ -332,4 +332,10 @@ int main(void) {
 
 	}
 
+}
+
+int main()
+{
+	ft__();
+	system("leaks a.out");
 }

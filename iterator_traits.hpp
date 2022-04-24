@@ -109,9 +109,9 @@ class mapiter
         }
         pointer operator->() const{return i->m_pair;}
         template <class Iterator, class I>
-        bool operator== (const mapiter<Iterator, I>& lhs){return (i->m_pair == (lhs.i)->m_pair);}
+        bool operator== (const mapiter<Iterator, I>& lhs){return (i->m_pair == (lhs.base())->m_pair);}
         template <class Iterator, class I>
-        bool operator!= (const mapiter<Iterator, I>& lhs){return (i->m_pair != (lhs.i)->m_pair);}
+        bool operator!= (const mapiter<Iterator, I>& lhs){return (i->m_pair != (lhs.base())->m_pair);}
 
 };
 
