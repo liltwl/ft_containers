@@ -6,7 +6,7 @@ using namespace std;
 namespace ft
 {
 template <class T, class Alloc = std::allocator<T> >
-class vector
+class Vector
 {
 	public :
     typedef T                                        	value_type;
@@ -32,25 +32,25 @@ protected :
     allocator_type allocc;
 
 public :
-    explicit vector() : arg(NULL), n(0), cap(2)
+    explicit Vector() : arg(NULL), n(0), cap(0)
     {
-		arg = allocc.allocate(cap);
-        // std::cout << "default vector const called" << std::endl;
+		//arg = allocc.allocate(cap);
+        // std::cout << "default Vector const called" << std::endl;
     }
-    explicit vector (size_type _n, const value_type& val = value_type(),
-                const allocator_type& alloc = allocator_type()) :  n(_n), cap(n + 1), arg(NULL), allocc(alloc)
+    explicit Vector (size_type _n, const value_type& val = value_type(),
+                const allocator_type& alloc = allocator_type()) :  n(_n), cap(n), arg(NULL), allocc(alloc)
     {
 		arg = allocc.allocate(cap);
 		for (int i = 0; i < _n ; i++)
 			allocc.construct(&arg[i], val);
-        // std::cout << "vector const called" << std::endl;
+        // std::cout << "Vector const called" << std::endl;
     }
 
 	template <class InputIterator>
-	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : arg(NULL), n(0), cap(0), allocc(alloc)
+	Vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type()) : arg(NULL), n(0), cap(0), allocc(alloc)
 	{
 		n = last - first;
-		cap = n + 1;
+		cap = n;
 		arg = allocc.allocate(cap);
 		for (int i = 0; i < n ; i++)
 		{
@@ -59,20 +59,22 @@ public :
 		}
 	}
 
-	vector (const vector& x) : arg(NULL), n(0), cap(0)
+	Vector (const Vector& x) : arg(NULL), n(0), cap(2)
 	{
 		allocc = x.allocc;
+		arg = allocc.allocate(cap);
 		*this = x;
-		// std::cout << "vector copy const called" << std::endl;
+		// std::cout << "Vector copy const called" << std::endl;
 	}
 
-    ~vector()
+    ~Vector()
     {
-        allocc.deallocate(arg, cap);
-        // std::cout << "vector deconst called" << std::endl;
+		if (cap != 0)
+        	allocc.deallocate(arg, cap);
+        // std::cout << "Vector deconst called" << std::endl;
     }
 
-	vector& operator= (const vector& x)
+	Vector& operator= (const Vector& x)
 	{
 		if (this != &x)
 		{
@@ -84,7 +86,7 @@ public :
 			if (x.n > 0)
 			{
 				n = x.n;
-				cap = n + 1;
+				cap = x.cap;
 				arg = allocc.allocate(cap);
 				for (int i = 0; i < n ; i++)
 					allocc.construct(&arg[i], x[i]);
@@ -92,7 +94,7 @@ public :
 			else
 				arg = allocc.allocate(cap);
 		}
-		// std::cout << "vector copy operator called" << std::endl;
+		// std::cout << "Vector copy operator called" << std::endl;
 		return	(*this);
 	}
 
@@ -154,7 +156,7 @@ public :
 		size_type i = 0;
 
 		tmp = arg;
-		if (cap > _n)
+		if (_n < cap)
 		{
 			for (i = n; i < _n ; i++)
 			{
@@ -163,7 +165,7 @@ public :
 		}
 		else if (_n > 0)
 		{
-			arg = allocc.allocate(_n + 1);
+			arg = allocc.allocate(_n);
 			for (i = 0; i < _n ; i++)
 			{
 				if(i < n)
@@ -172,7 +174,7 @@ public :
 					allocc.construct(&arg[i], val);
 			}
 			allocc.deallocate(tmp, cap);
-			cap = _n + 1;
+			cap = _n;
 		}
 		else
 			arg = NULL;
@@ -192,15 +194,15 @@ public :
 		tmp = arg;
 		if (_n > cap)
 		{
-			if (cap > 0)
-				allocc.deallocate(arg, cap);
 			arg = allocc.allocate(_n);
-			cap = _n;
 			for (i = 0; i < n ; i++)
 			{
 				if(i < n)
 					allocc.construct(&arg[i], tmp[i]);
 			}
+			if (cap > 0)
+				allocc.deallocate(tmp, cap);
+			cap = _n;
 		}
 	}
 
@@ -224,14 +226,14 @@ public :
 	
 	reference at(size_type _n)
 	{
-		if (_n < this->n)
+		if (_n < n && _n >= 0)
 			return (arg[_n]);
 		throw outofbounds();
 	}
 
 	const_reference at (size_type _n) const
 	{
-		if (_n < this->n)
+		if (_n < n && _n >= 0)
 			return (arg[_n]);
 		throw outofbounds();
 	}
@@ -259,19 +261,24 @@ public :
 	iterator insert(iterator position, const value_type& val)
 	{
 		iterator ss;
-		int i = position - begin();
 
 		for (ss = begin(); ss < end(); ss++)
 			if (ss == position)
 				break;
-		if (ss == end())
+		int i = ss - begin();
+		if (position == end())
 		{
+			if (cap <= n)
+				reserve(n * 2);
+			// else
 			resize(n + 1);
 			allocc.construct(arg + n - 1, val);
 			return (end() - 1);
 		}
 		else
 		{
+			if (cap <= n)
+				reserve(n * 2);
 			resize(n + 1);
 			for (ss = end() - 1; ss > begin() + i; ss--)
 			{
@@ -279,13 +286,17 @@ public :
 			}
 			arg[i] = val;
 		}
-		return (begin() + i + 1);
+		return (begin() + i);
 	}
 
 
-	void insert (iterator position, size_type n, const value_type& val)
+	void insert (iterator position, size_type _n, const value_type& val)
 	{
-		for (int i = 0; i < n; i++)
+		int j = position - begin();
+		if (_n > cap)
+			reserve(_n + cap);
+		position = begin() + j;
+		for (int i = 0; i < _n; i++)
 		{
 			position = insert(position, val);
 		}
@@ -294,7 +305,10 @@ public :
 	template <class InputIterator>
     void insert (iterator position, InputIterator first, InputIterator last)
 	{
-		
+		int j = position - begin();
+		if (last - first > cap)
+			reserve((last - first )+ cap);
+		position = begin() + j;
 		for (InputIterator tmp = first; tmp < last; tmp++)
 		{
 			position = insert(position, *tmp);
@@ -313,25 +327,33 @@ public :
 
 	void assign (size_type _n, const value_type& val)
 	{
-		allocc.deallocate(arg, cap);
-		n = 0;
-		cap = 3;
-		arg = allocc.allocate(cap);
-		insert(arg, _n, val);
+		// if (cap > 0)
+		// 	allocc.deallocate(arg, cap);
+		// n = 0;
+		// cap = 0;
+		clear();
+		if (cap < _n)
+			reserve(_n);
+		//arg = allocc.allocate(cap);
+		insert(begin(), _n, val);
 	}
 
 	template <class InputIterator>
 	void assign(InputIterator first, InputIterator last)
 	{
-		allocc.deallocate(arg, cap);
-		n = 0;
-		cap = 2;
-		arg = allocc.allocate(cap);
-		InputIterator tmp;
-		for (InputIterator tmp = first; tmp < last; tmp++)
-		{
-			push_back(*tmp);
-		}
+		// allocc.deallocate(arg, cap);
+		// n = 0;
+		clear();
+		if (cap < last - first)
+			reserve(last - first);
+		// cap = 1;
+		// arg = allocc.allocate(cap);
+		// InputIterator tmp;
+		// for (InputIterator tmp = first; tmp < last; tmp++)
+		// {
+		// 	push_back(*tmp);
+		// }
+		insert(begin() ,first, last);
 	}
 
 	iterator erase (iterator position)
@@ -362,25 +384,33 @@ public :
 		return (tmp);
 	}
 
-	void swap (vector& x)
+	void swap (Vector& x)
 	{
-		vector<T> tmp;
+		// Vector<T> tmp;
+		value_type *tmp;
+		size_type i;
+		size_type j;
 
-		tmp = x;
-		x = *this;
-		*this = tmp;
+		tmp = x.arg;
+		i = x.cap;
+		j = x.n;
+		x.arg = arg;
+		x.n = n;
+		x.cap = cap;
+		arg = tmp;
+		n = j;
+		cap = i;
 	}
 
 	void clear()
 	{
-		allocc.deallocate(arg, cap);
+		//allocc.deallocate(arg, cap);
 		n = 0;
-		cap = 3;
-		arg = allocc.allocate(cap);
+		//arg = allocc.allocate(cap);
 	}
 
 	template <class T1>
-	bool operator== (const vector<T1>& lhs)
+	bool operator== (const Vector<T1>& lhs)
 	{
 		if(size() != lhs.size())
 			return (0);
@@ -393,17 +423,17 @@ public :
 	}
 
 	template <class T1>
-	bool operator!= (const vector<T1>& lhs)
+	bool operator!= (const Vector<T1>& lhs)
 	{
 		return !(*this == lhs);
 	}
 
 	template <class T1>
-	bool operator< (const vector<T1>& lhs)
+	bool operator< (const Vector<T1>& lhs)
 	{
 		int n1 = 0;
 
-		n1 = (size() > lhs.size()?size():lhs.size());
+		n1 = (size() < lhs.size()?size():lhs.size());
 		for (int i = 0; i < n1; i++)
 		{
 			if (this->at(i) != lhs[i])
@@ -413,19 +443,19 @@ public :
 	}
 
 	template <class T1>
-	bool operator<= (const vector<T1>& lhs)
+	bool operator<= (const Vector<T1>& lhs)
 	{
 		return (*this < lhs) || *this==lhs;
 	}
 
 	template <class T1>
-	bool operator> (const vector<T1>& lhs)
+	bool operator> (const Vector<T1>& lhs)
 	{
 		return (!(*this < lhs))&&!(*this == lhs);
 	}
 
 	template <class T1>
-	bool operator>= (const vector<T1>& lhs)
+	bool operator>= (const Vector<T1>& lhs)
 	{
 		return !(*this < lhs);
 	}
@@ -434,5 +464,15 @@ public :
 	{
 		return (allocc.max_size());
 	}
+	allocator_type get_allocator() const
+	{
+		return allocc;
+	}
 };
+
+	template <class T>
+		void swap(ft::Vector<T>& lhs, ft::Vector<T>& rh)
+		{
+			lhs.swap(rh);
+		};
 }

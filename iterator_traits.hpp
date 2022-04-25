@@ -273,7 +273,10 @@ class reverse_iterator : public iterator<typename iterator_traits<Iter>::iterato
         reverse_iterator (const reverse_iterator<_Iter>& rev_it): prt(rev_it.base()) {}
 
         iterator_type base() const {return (prt);}
-        reference operator*() const{return(*(prt - 1));}
+        reference operator*() const{
+            iterator_type tmp = prt;
+            tmp--;
+            return *(tmp);}
         reverse_iterator operator+ (difference_type n) const{return reverse_iterator(prt - n);}
         reverse_iterator& operator++(){prt--;return *this;}
         reverse_iterator  operator++(int){
@@ -296,8 +299,11 @@ class reverse_iterator : public iterator<typename iterator_traits<Iter>::iterato
             prt += n;
             return *this;
         }
-        pointer operator->() const{return &(*(prt - 1));}
-        reference operator[] (difference_type n) const{return *(prt - 1 + n);}
+        pointer operator->() const{
+            iterator_type tmp = prt;
+            tmp--;
+            return &(*(tmp));}
+        reference operator[] (difference_type n) const{return *(prt + n - 1);}
         template <class Iterator>
         bool operator< (const reverse_iterator<Iterator>& lhs){return (prt > lhs.prt);}
         template <class Iterator>
